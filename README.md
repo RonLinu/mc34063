@@ -1,2 +1,4 @@
 # mc34063
-MC34063 calcularot
+
+A web calculator to calculate the parts needed to build a switching regulator
+using the MC34063 chip.
