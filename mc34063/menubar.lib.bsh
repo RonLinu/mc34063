@@ -1,0 +1,56 @@
+
+// Create ONE menu bar entry with its sub-items
+
+if (menuBar == void) menuBar = new JMenuBar();
+
+void createMenu(String top, String[] items ) {
+    var cmd = """
+        var {TOP_ID}Menu = new JMenu("{TOP_ID}");
+        {TOP_ID}Menu.setMnemonic(KeyEvent.{MNEMONIC});
+        menuBar.add({TOP_ID}Menu);
+    """;
+
+    var topId = top.replace("&","").trim();
+    cmd = cmd.replace("{TOP_ID}", topId);
+
+    var index = top.indexOf("&");
+    var mnemonic = "VK_" + top.toUpperCase().charAt(index+1);
+    cmd = cmd.replace("{MNEMONIC}", mnemonic);
+
+    // ---------------------------------
+    var itemTemplate = """
+        var {ITEM_ID}Item = new JMenuItem("{ITEM_NAME}");
+        {ITEM_ID}Item.setMnemonic(KeyEvent.{MNEMONIC});
+        {ITEM_ID}Item.addActionListener(new ActionListener() {
+            actionPerformed(e) { mbar_{TOP_ID}_{ITEM_ID}(); }
+        });
+        {TOP_ID}Menu.add({ITEM_ID}Item);
+    """;
+    itemTemplate = itemTemplate.replace("{TOP_ID}", topId);
+
+    for(item : items) {
+        if (item.trim().isEmpty()) {
+            cmd += topId + "Menu.addSeparator(); \n";
+            continue;
+        }
+
+        var itemCopy = itemTemplate;
+        var itemName = item.replace("&","");
+        var itemId = itemName.trim().replace(" ","_").replace(".","");
+
+        itemCopy = itemCopy.replace("{ITEM_ID}", itemId).replace("{ITEM_NAME}", itemName);
+        
+        var index = item.indexOf("&");
+        var mnemonic = "VK_" + item.toUpperCase().charAt(index+1);
+        itemCopy = itemCopy.replace("{MNEMONIC}", mnemonic);
+        cmd += itemCopy;
+    }
+
+    eval(cmd);
+    
+    // Accept 'frame', 'gFrame' or 'Frame'
+    if (frame != void) 
+		frame.setJMenuBar(menuBar);
+	else
+		gFrame.setJMenuBar(menuBar);
+}

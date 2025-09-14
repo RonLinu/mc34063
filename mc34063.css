@@ -1,0 +1,80 @@
+
+.split {
+  height: 100%;
+  width: 50%;
+  position: fixed;
+  top: 0;
+  overflow-x: hidden;
+}
+
+.left {
+  left: 0;
+  background-color: #b0f0f0;
+  color: black;
+}
+
+.right {
+  right: 0;
+  background-color: #f0f0f0;
+  color: black;
+}
+
+.split.left {
+  display: flex;
+  flex-direction: column;       /* Stack children vertically */
+  justify-content: center;      /* Center vertically */
+  align-items: center;          /* Center horizontally */
+  height: 100vh;                /* Full height */
+  padding: 10px;                /* Optional padding */
+}
+
+.split.left input {
+  margin: 8px 0;
+  width: 20%;                   /* Or desired width */
+  max-width: 300px;             /* Optional max width */
+}
+
+.split.left button {
+  margin: 8px 0;
+  width: 30%;                   /* Or desired width */
+  max-width: 300px;             /* Optional max width */
+}
+
+.form-row {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.label-right {
+  display: inline-block;
+  width: 120px;
+  text-align: right;
+  margin-right: 10px;
+}
+
+.label-left {
+  display: inline-block;
+  width: 120px;
+  text-align: left;
+  margin-right: 10px;
+}
+
+#regulator-name {
+  text-align: center;
+}
+
+#schematic {
+  text-align: center;
+}
+
+/* Remove scroll buttons on number inputs in Chromium browsers */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove scroll buttons on number inputs in Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
