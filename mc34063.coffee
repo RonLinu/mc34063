@@ -3,13 +3,8 @@
 RIPPLE = 0.1  # default ripple in volts
 
 calcBtn = document.getElementById 'calculate'
+
 calcBtn.onclick = ->
-    calculate()
-
-document.getElementById('theImage').src = "mc34063/splash.png"
-
-# --------------------------------------
-calculate = ->
     values = {
         input_voltage  : document.getElementById('inputVoltage').value
         output_voltage : document.getElementById('outputVoltage').value
@@ -18,10 +13,23 @@ calculate = ->
         resistor_R1    : document.getElementById('resistorR1').value
     }
 
-    if areValidNumbers(values) and areWithinLimits(values)
-        calculation values
+    if validNumbers(values) and withinLimits(values)
+        calculate values
     else
         clear_results()
+
+# --------------------------------------
+clear_results = ->
+    topList = document.getElementById 'results'
+    results = "<pre>"
+    for x in [1..6]
+        results += "&nbsp;\n"
+    results += "</pre>"
+    topList.innerHTML = results
+
+    title = document.getElementById 'regulator-name'
+    title.innerHTML = "Regulator name"
+    document.getElementById('theImage').src = "mc34063/splash.png"
 
 # --------------------------------------
 isValidFloat = (str) ->
@@ -50,7 +58,7 @@ format_results = (lmin, ct, cout, rsc, r2, rb) ->
     }
 
 # --------------------------------------
-areValidNumbers = (values) ->
+validNumbers = (values) ->
     msg = ''
     good = true
 
@@ -67,13 +75,11 @@ areValidNumbers = (values) ->
             confirmButtonText: 'OK'
             position: 'top'
             # 'top', 'top-left', 'top-right', 'center', 'center-left',
-            # 'center-right', 'bottom', 'bottom-left', and 'bottom-right'
+            # 'center-right', 'bottom', 'bottom-left', 'bottom-right'
     good
 
-
-
 # --------------------------------------
-areWithinLimits = (values) ->
+withinLimits = (values) ->
     msg = ''
     within = true
     nums = str_to_float values
@@ -115,20 +121,7 @@ show_results = (r, name, schematic) ->
     document.getElementById('theImage').src = "mc34063/#{schematic}"
 
 # --------------------------------------
-clear_results = ->
-    topList = document.getElementById 'results'
-    results = "<pre>"
-    for x in [1..6]
-        results += "&nbsp;\n"
-    results += "</pre>"
-    topList.innerHTML = results
-
-    title = document.getElementById 'regulator-name'
-    title.innerHTML = "Regulator name"
-    document.getElementById('theImage').src = "mc34063/splash.png"
-
-# --------------------------------------
-calculation = (values) ->
+calculate = (values) ->
     nums = str_to_float values
 
     if nums.vout < 0
@@ -192,3 +185,8 @@ inverter = (n) ->
 
     results = format_results lmin, ct, cout, rsc, r2, rb
     show_results results, "Inverter regulator", "inverter.png"
+
+# ---------------------------------------------------------------------
+
+# Do this at start up HERE, not in html file anymore
+clear_results()
