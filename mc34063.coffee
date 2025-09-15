@@ -1,9 +1,12 @@
 # https://github.com/RonLinu/mc34063.git
+
 RIPPLE = 0.1  # default ripple in volts
 
 calcBtn = document.getElementById 'calculate'
 calcBtn.onclick = ->
     calculate()
+
+document.getElementById('theImage').src = "mc34063/splash.png"
 
 # --------------------------------------
 calculate = ->
@@ -122,7 +125,7 @@ clear_results = ->
 
     title = document.getElementById 'regulator-name'
     title.innerHTML = "Regulator name"
-    document.getElementById('theImage').src = ""
+    document.getElementById('theImage').src = "mc34063/splash.png"
 
 # --------------------------------------
 calculation = (values) ->
