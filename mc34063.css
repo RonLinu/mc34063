@@ -9,13 +9,13 @@
 
 .left {
   left: 0;
-  background-color: #b0f0f0;
+  background-color: LightCyan;
   color: black;
 }
 
 .right {
   right: 0;
-  background-color: #f0f0f0;
+  background-color: Wheat;
   color: black;
 }
 
@@ -23,13 +23,13 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 80%; /* or a specific pixel width less than container */
+  width: 80%;
 }
 
 .split.left {
   display: flex;
   flex-direction: column;       /* Stack children vertically */
-  justify-content: center;      /* Center vertically */
+  justify-content: flex-start;      /* Center vertically */
   align-items: center;          /* Center horizontally */
   height: 100vh;                /* Full height */
   padding: 10px;                /* Optional padding */

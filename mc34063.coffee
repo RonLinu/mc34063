@@ -5,13 +5,12 @@ RIPPLE = 0.1  # default ripple in volts
 calcBtn = document.getElementById 'calculate'
 
 calcBtn.onclick = ->
-    values = {
+    values =
         input_voltage  : document.getElementById('inputVoltage').value
         output_voltage : document.getElementById('outputVoltage').value
         output_current : document.getElementById('outputCurrent').value
         frequency      : document.getElementById('frequency').value
         resistor_R1    : document.getElementById('resistorR1').value
-    }
 
     if validNumbers(values) and withinLimits(values)
         calculate values
