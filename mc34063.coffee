@@ -2,15 +2,28 @@
 
 RIPPLE = 0.1  # default ripple in volts
 
+window.onload = ->
+  document.getElementById('vinField').focus()
+
 calcBtn = document.getElementById 'calculate'
 
 calcBtn.onclick = ->
+    # Read fields values
     values =
-        input_voltage  : document.getElementById('inputVoltage').value
-        output_voltage : document.getElementById('outputVoltage').value
-        output_current : document.getElementById('outputCurrent').value
-        frequency      : document.getElementById('frequency').value
-        resistor_R1    : document.getElementById('resistorR1').value
+        vin  : document.getElementById('vinField').value
+        vout : document.getElementById('voutField').value
+        iout : document.getElementById('ioutField').value
+        freq : document.getElementById('freqField').value
+        res1 : document.getElementById('res1Field').value
+
+    # Restore units labels (from any previous error messages)
+    for key, _ of values
+        label = document.getElementById(key+"FieldUnit")
+        text = label.innerText
+        index = text.indexOf(" ")
+        if index != -1 then text = text.substring(0,index)
+        label.innerHTML = text
+        label.style.color = "black" 
 
     if validNumbers(values) and withinLimits(values)
         calculate values
@@ -19,15 +32,8 @@ calcBtn.onclick = ->
 
 # --------------------------------------
 clear_results = ->
-    topList = document.getElementById 'results'
-    results = "<pre>"
-    for x in [1..6]
-        results += "&nbsp;\n"
-    results += "</pre>"
-    topList.innerHTML = results
-
-    title = document.getElementById 'regulator-name'
-    title.innerHTML = "Regulator name"
+    document.getElementById('results').innerHTML = ""
+    document.getElementById('regulator-name').innerHTML = "Regulator name"
     document.getElementById('theImage').src = "mc34063/splash.png"
 
 # --------------------------------------
@@ -38,11 +44,11 @@ isValidFloat = (str) ->
 # --------------------------------------
 str_to_float = (values) ->
     nums = {
-        vin  : Number(values.input_voltage)
-        vout : Number(values.output_voltage)
-        iout : Number(values.output_current)
-        freq : Number(values.frequency)
-        res1 : Number(values.resistor_R1)
+        vin  : Number(values.vin)
+        vout : Number(values.vout)
+        iout : Number(values.iout)
+        freq : Number(values.freq)
+        res1 : Number(values.res1)
     }
 
 # --------------------------------------
@@ -58,50 +64,50 @@ format_results = (lmin, ct, cout, rsc, r2, rb) ->
 
 # --------------------------------------
 validNumbers = (values) ->
-    msg = ''
     good = true
 
-    for key, val of values
-        unless isValidFloat(val)
-            msg += key[0].toUpperCase() + key.slice(1).replace("_"," ") + "<br>"
+    for key, value of values
+        unless isValidFloat(value)
+            good = false
+            label = document.getElementById(key+"FieldUnit")
+            unit = label.innerText
+            label.innerHTML = "#{unit} \u2190 invalid number"
+            label.style.color = "darkred" 
 
-    if msg
-        good = false
-        Swal.fire
-            title: "Fields with invalid number"
-            html: "<div style='text-align: center;'>#{msg}</div>"
-            icon: "error"
-            confirmButtonText: 'OK'
-            position: 'top'
-            # 'top', 'top-left', 'top-right', 'center', 'center-left',
-            # 'center-right', 'bottom', 'bottom-left', 'bottom-right'
     good
 
 # --------------------------------------
 withinLimits = (values) ->
-    msg = ''
+    showLimitsError = (id, msg) ->
+        label = document.getElementById(id)
+        unit = label.innerText
+        label.innerHTML = "#{unit} \u2190 range #{msg}"
+        label.style.color = "darkred" 
+
     within = true
     nums = str_to_float values
 
-    if not (5 <= nums.vin <= 40) then msg    += "Input voltage \t(5V to 40V)<br>"
-    if not (-40 <= nums.vout <= 40) then msg += "Output voltage \t(-40V to 40V)<br>"
-    if not (1 <= nums.iout <= 1000) then msg += "Output current \t(1ma to 1000mA)<br>"
-    if not (20 <= nums.freq <= 500) then msg += "Frequency \t\t(20KH to 500KHz)<br>"
-    if not (1 <= nums.res1 <= 100) then msg  += "Resistor R1 \t\t(1K ot 100K)<br>"
-
-    if msg
+    unless (5 <= nums.vin <= 40)
         within = false
-        Swal.fire
-            title: "Fields with out-of-limit values"
-            html: "<div style='text-align: center;'>#{msg}</div>"
-            icon: "error"
-            confirmButtonText: 'OK'
-            position: 'top'
+        showLimitsError "vinFieldUnit", "5...40"
+    unless (-40 <= nums.vout <= 40)
+         within = false
+         showLimitsError "voutFieldUnit", "-40...40"
+    unless (5 <= nums.iout <= 1000)
+        within = false
+        showLimitsError "ioutFieldUnit", "5...1000"
+    unless (25 <= nums.freq <= 500)
+        within = false
+        showLimitsError "freqFieldUnit", "25...500"
+    unless (1 <= nums.res1 <= 100)
+        within = false
+        showLimitsError "res1FieldUnit", "1...100"
+        
     within
 
 # --------------------------------------
 show_results = (r, name, schematic) ->
-    topList = document.getElementById 'results'
+    footer = document.getElementById 'results'
     results = "<pre>"
     results += "L&nbsp;&nbsp;&nbsp;= #{r.lmin} uH\n"
     results += "Ct&nbsp;&nbsp;= #{r.ct} pF\n"
@@ -113,11 +119,11 @@ show_results = (r, name, schematic) ->
     else
         results += "Rb&nbsp;&nbsp;= #{r.rb} Ω\n"
     results += "</pre>"
-    topList.innerHTML = results
+    footer.innerHTML = results
 
-    title = document.getElementById 'regulator-name'
-    title.innerHTML = "#{name}"
+    document.getElementById('regulator-name').innerHTML = name
     document.getElementById('theImage').src = "mc34063/#{schematic}"
+
 
 # --------------------------------------
 calculate = (values) ->
@@ -144,7 +150,7 @@ step_down = (n) ->
     rsc   = 0.33 / ipeak
     r2    = (n.vout - 1.25) / 1.25 * n.res1    # R1 & R2 are in Kohms
     rb    = 0.0
-    
+
     results = format_results lmin, ct, cout, rsc, r2, rb
     show_results results, "Stepdown regulator", "step_down.png"
 
@@ -166,7 +172,7 @@ step_up = (n) ->
 
     results = format_results lmin, ct, cout, rsc, r2, rb
     show_results results, "Stepup regulator", "step_up.png"
-    
+
 # --------------------------------------
 inverter = (n) ->
     ratio   = (Math.abs(n.vout) + 0.8) / (n.vin - 0.8 - n.vout)

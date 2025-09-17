@@ -54,15 +54,15 @@
 
 .label-right {
   display: inline-block;
-  width: 120px;
-  text-align: right;
+  width: 180px;
+  text-align: left;
   margin-right: 10px;
 }
 
 .label-left {
   display: inline-block;
-  width: 120px;
-  text-align: left;
+  width: 180px;
+  text-align: right;
   margin-right: 10px;
 }
 

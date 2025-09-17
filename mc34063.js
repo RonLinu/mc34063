@@ -5,17 +5,34 @@
 
   RIPPLE = 0.1; // default ripple in volts
 
+  window.onload = function() {
+    return document.getElementById('vinField').focus();
+  };
+
   calcBtn = document.getElementById('calculate');
 
   calcBtn.onclick = function() {
-    var values;
+    var _, index, key, label, text, values;
+    // Read fields values
     values = {
-      input_voltage: document.getElementById('inputVoltage').value,
-      output_voltage: document.getElementById('outputVoltage').value,
-      output_current: document.getElementById('outputCurrent').value,
-      frequency: document.getElementById('frequency').value,
-      resistor_R1: document.getElementById('resistorR1').value
+      vin: document.getElementById('vinField').value,
+      vout: document.getElementById('voutField').value,
+      iout: document.getElementById('ioutField').value,
+      freq: document.getElementById('freqField').value,
+      res1: document.getElementById('res1Field').value
     };
+// Restore units labels from any previous error messages
+    for (key in values) {
+      _ = values[key];
+      label = document.getElementById(key + "FieldUnit");
+      text = label.innerText;
+      index = text.indexOf(" ");
+      if (index !== -1) {
+        text = text.substring(0, index);
+      }
+      label.innerHTML = text;
+      label.style.color = "black";
+    }
     if (validNumbers(values) && withinLimits(values)) {
       return calculate(values);
     } else {
@@ -25,16 +42,8 @@
 
   // --------------------------------------
   clear_results = function() {
-    var i, results, title, topList, x;
-    topList = document.getElementById('results');
-    results = "<pre>";
-    for (x = i = 1; i <= 6; x = ++i) {
-      results += "&nbsp;\n";
-    }
-    results += "</pre>";
-    topList.innerHTML = results;
-    title = document.getElementById('regulator-name');
-    title.innerHTML = "Regulator name";
+    document.getElementById('results').innerHTML = "";
+    document.getElementById('regulator-name').innerHTML = "Regulator name";
     return document.getElementById('theImage').src = "mc34063/splash.png";
   };
 
@@ -49,11 +58,11 @@
   str_to_float = function(values) {
     var nums;
     return nums = {
-      vin: Number(values.input_voltage),
-      vout: Number(values.output_voltage),
-      iout: Number(values.output_current),
-      freq: Number(values.frequency),
-      res1: Number(values.resistor_R1)
+      vin: Number(values.vin),
+      vout: Number(values.vout),
+      iout: Number(values.iout),
+      freq: Number(values.freq),
+      res1: Number(values.res1)
     };
   };
 
@@ -72,68 +81,60 @@
 
   // --------------------------------------
   validNumbers = function(values) {
-    var good, key, msg, val;
-    msg = '';
+    var good, key, label, unit, value;
     good = true;
     for (key in values) {
-      val = values[key];
-      if (!isValidFloat(val)) {
-        msg += key[0].toUpperCase() + key.slice(1).replace("_", " ") + "<br>";
+      value = values[key];
+      if (!isValidFloat(value)) {
+        good = false;
+        label = document.getElementById(key + "FieldUnit");
+        unit = label.innerText;
+        label.innerHTML = `${unit} \u2190 invalid number`;
+        label.style.color = "darkred";
       }
     }
-    if (msg) {
-      good = false;
-      Swal.fire({
-        title: "Fields with invalid number",
-        html: `<div style='text-align: center;'>${msg}</div>`,
-        icon: "error",
-        confirmButtonText: 'OK',
-        position: 'top'
-      });
-    }
-    // 'top', 'top-left', 'top-right', 'center', 'center-left',
-    // 'center-right', 'bottom', 'bottom-left', 'bottom-right'
     return good;
   };
 
   // --------------------------------------
   withinLimits = function(values) {
-    var msg, nums, ref, ref1, ref2, ref3, ref4, within;
-    msg = '';
+    var nums, ref, ref1, ref2, ref3, ref4, showLimitsError, within;
+    showLimitsError = function(id, msg) {
+      var label, unit;
+      label = document.getElementById(id);
+      unit = label.innerText;
+      label.innerHTML = `${unit} \u2190 range ${msg}`;
+      return label.style.color = "darkred";
+    };
     within = true;
     nums = str_to_float(values);
     if (!((5 <= (ref = nums.vin) && ref <= 40))) {
-      msg += "Input voltage \t(5V to 40V)<br>";
+      within = false;
+      showLimitsError("vinFieldUnit", "5...40");
     }
     if (!((-40 <= (ref1 = nums.vout) && ref1 <= 40))) {
-      msg += "Output voltage \t(-40V to 40V)<br>";
+      within = false;
+      showLimitsError("voutFieldUnit", "-40...40");
     }
-    if (!((1 <= (ref2 = nums.iout) && ref2 <= 1000))) {
-      msg += "Output current \t(1ma to 1000mA)<br>";
+    if (!((5 <= (ref2 = nums.iout) && ref2 <= 1000))) {
+      within = false;
+      showLimitsError("ioutFieldUnit", "5...1000");
     }
-    if (!((20 <= (ref3 = nums.freq) && ref3 <= 500))) {
-      msg += "Frequency \t\t(20KH to 500KHz)<br>";
+    if (!((25 <= (ref3 = nums.freq) && ref3 <= 500))) {
+      within = false;
+      showLimitsError("freqFieldUnit", "25...500");
     }
     if (!((1 <= (ref4 = nums.res1) && ref4 <= 100))) {
-      msg += "Resistor R1 \t\t(1K ot 100K)<br>";
-    }
-    if (msg) {
       within = false;
-      Swal.fire({
-        title: "Fields with out-of-limit values",
-        html: `<div style='text-align: center;'>${msg}</div>`,
-        icon: "error",
-        confirmButtonText: 'OK',
-        position: 'top'
-      });
+      showLimitsError("res1FieldUnit", "1...100");
     }
     return within;
   };
 
   // --------------------------------------
   show_results = function(r, name, schematic) {
-    var results, title, topList;
-    topList = document.getElementById('results');
+    var footer, results;
+    footer = document.getElementById('results');
     results = "<pre>";
     results += `L&nbsp;&nbsp;&nbsp;= ${r.lmin} uH\n`;
     results += `Ct&nbsp;&nbsp;= ${r.ct} pF\n`;
@@ -146,9 +147,8 @@
       results += `Rb&nbsp;&nbsp;= ${r.rb} Ω\n`;
     }
     results += "</pre>";
-    topList.innerHTML = results;
-    title = document.getElementById('regulator-name');
-    title.innerHTML = `${name}`;
+    footer.innerHTML = results;
+    document.getElementById('regulator-name').innerHTML = name;
     return document.getElementById('theImage').src = `mc34063/${schematic}`;
   };
 
@@ -202,7 +202,6 @@
     return show_results(results, "Stepup regulator", "step_up.png");
   };
 
-  
   // --------------------------------------
   inverter = function(n) {
     var cout, ct, ipeak, lmin, r2, ratio, rb, results, rsc, toff, ton_max, tontoff;

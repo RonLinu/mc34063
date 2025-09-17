@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- MC34063 -->
-<html>
+<html lang="en">
 <head>
     <title>MC34063</title>
     <meta charset="UTF-8">
@@ -19,29 +19,29 @@
     
     <form>
       <div class="form-row">
-        <label for="inputVoltage" class="label-right">Input voltage</label>
-        <input type="text" id="inputVoltage" name="inputVoltage" value="24">
-        <label for="inputVoltage" class="label-left">V</label>
+        <label for="inputVoltage" class="label-left">Input voltage</label>
+        <input type="text" id="vinField" name="inputVoltage" value="24">
+        <label for="inputVoltage" class="label-right" id="vinFieldUnit">V</label>
       </div>
       <div class="form-row">
-        <label for="outputVoltage" class="label-right">Output voltage</label>
-        <input type="text" id="outputVoltage" name="outputVoltage" value="5">
-        <label for="outputVoltage" class="label-left">V</label>
+        <label for="outputVoltage" class="label-left">Output voltage</label>
+        <input type="text" id="voutField" name="outputVoltage" value="5">
+        <label for="outputVoltage" class="label-right" id="voutFieldUnit" >V</label>
       </div>
       <div class="form-row">
-        <label for="outputCurrent" class="label-right">Output current</label>
-        <input type="text" id="outputCurrent" name="outputCurrent" value="100">
-        <label for="outputCurrent" class="label-left">mA</label>
+        <label for="outputCurrent" class="label-left">Output current</label>
+        <input type="text" id="ioutField" name="outputCurrent" value="100">
+        <label for="outputCurrent" class="label-right" id="ioutFieldUnit">mA</label>
       </div>
       <div class="form-row">
-        <label for="frequency" class="label-right">Frequency</label>
-        <input type="text" id="frequency" name="frequency" value="25">
-        <label for="frequency" class="label-left">KHz</label>
+        <label for="frequency" class="label-left">Frequency</label>
+        <input type="text" id="freqField" name="frequency" value="25">
+        <label for="frequency" class="label-right" id="freqFieldUnit">KHz</label>
       </div>
       <div class="form-row">
-        <label for="resistorR1" class="label-right">Resistor R1</label>
-        <input type="text" id="resistorR1" name="resistorR1" value="1">
-        <label for="resistorR1" class="label-left">KΩ</label>
+        <label for="resistorR1" class="label-left">Resistor R1</label>
+        <input type="text" id="res1Field" name="resistorR1" value="1">
+        <label for="resistorR1" class="label-right" id="res1FieldUnit">KΩ</label>
       </div>
     </form>
 
@@ -58,7 +58,7 @@
         </div>
 
     <div id="schematic">
-         <img id="theImage" src="" alt="Regulator schematic">
+         <img id="theImage" src="mc34063/splash.png" alt="Regulator schematic">
     </div>
         
     </div>
