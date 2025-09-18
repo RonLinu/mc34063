@@ -40,24 +40,22 @@ isValidFloat = (str) ->
 
 # --------------------------------------
 str_to_float = (values) ->
-    nums = {
+    nums =
         vin  : Number(values.vin)
         vout : Number(values.vout)
         iout : Number(values.iout)
         freq : Number(values.freq)
         res1 : Number(values.res1)
-    }
 
 # --------------------------------------
 format_results = (lmin, ct, cout, rsc, r2, rb) ->
-    results = {
+    results =
         lmin : (lmin * 1e6).toFixed(0)
         ct   : (ct * 1e12).toFixed(0)
         cout : (cout * 1e6).toFixed(0)
         rsc  : rsc.toFixed(1)
         r2   : r2.toFixed(1)
         rb   : rb.toFixed(0)
-    }
 
 # --------------------------------------
 validNumbers = (values) ->
@@ -87,9 +85,11 @@ withinLimits = (values) ->
     unless (5 <= nums.vin <= 40)
         within = false
         showLimitsError "vinFieldUnit", "5...40"
-    unless (-40 <= nums.vout <= 40)
+        
+    unless (-40 <= nums.vout <= -3) or (3 <= nums.vout <= 40)
          within = false
-         showLimitsError "voutFieldUnit", "-40...40"
+         showLimitsError "voutFieldUnit", "-40..-3 or 3..40"
+    
     unless (5 <= nums.iout <= 1000)
         within = false
         showLimitsError "ioutFieldUnit", "5...1000"
@@ -106,21 +106,17 @@ withinLimits = (values) ->
 show_results = (r, name, schematic) ->
     footer = document.getElementById 'results'
     results = "<pre>"
-    results += "L   = #{r.lmin} uH\n"
-    results += "Ct  = #{r.ct} pF\n"
-    results += "Co  = #{r.cout} uF\n"
-    results += "Rsc = #{r.rsc} Ω\n"
-    results += "R2  = #{r.r2} KΩ\n"
-    if r.rb is "0"
-        results += "\n"
-    else
-        results += "Rb  = #{r.rb} Ω\n"
+    results += "Lmin = #{r.lmin} uH\n"
+    results += "Ct   = #{r.ct} pF\n"
+    results += "Co   = #{r.cout} uF\n"
+    results += "Rsc  = #{r.rsc} Ω\n"
+    results += "R2   = #{r.r2} KΩ\n"
+    results += "Rb   = #{r.rb} Ω\n" if r.rb isnt "0"
     results += "</pre>"
     footer.innerHTML = results
 
     document.getElementById('regulator-name').innerHTML = name
     document.getElementById('theImage').src = "mc34063/#{schematic}"
-
 
 # --------------------------------------
 calculate = (values) ->
@@ -187,8 +183,3 @@ inverter = (n) ->
 
     results = format_results lmin, ct, cout, rsc, r2, rb
     show_results results, "Inverter regulator", "inverter.png"
-
-# ---------------------------------------------------------------------
-
-# Do this at start up HERE, not in html file anymore
-clear_results()

@@ -93,7 +93,7 @@
 
   // --------------------------------------
   withinLimits = function(values) {
-    var nums, ref, ref1, ref2, ref3, ref4, showLimitsError, within;
+    var nums, ref, ref1, ref2, ref3, ref4, ref5, showLimitsError, within;
     showLimitsError = function(id, msg) {
       var label, unit;
       label = document.getElementById(id);
@@ -107,19 +107,19 @@
       within = false;
       showLimitsError("vinFieldUnit", "5...40");
     }
-    if (!((-40 <= (ref1 = nums.vout) && ref1 <= 40))) {
+    if (!(((-40 <= (ref1 = nums.vout) && ref1 <= -3)) || ((3 <= (ref2 = nums.vout) && ref2 <= 40)))) {
       within = false;
-      showLimitsError("voutFieldUnit", "-40...40");
+      showLimitsError("voutFieldUnit", "-40..-3 or 3..40");
     }
-    if (!((5 <= (ref2 = nums.iout) && ref2 <= 1000))) {
+    if (!((5 <= (ref3 = nums.iout) && ref3 <= 1000))) {
       within = false;
       showLimitsError("ioutFieldUnit", "5...1000");
     }
-    if (!((25 <= (ref3 = nums.freq) && ref3 <= 500))) {
+    if (!((25 <= (ref4 = nums.freq) && ref4 <= 500))) {
       within = false;
       showLimitsError("freqFieldUnit", "25...500");
     }
-    if (!((1 <= (ref4 = nums.res1) && ref4 <= 100))) {
+    if (!((1 <= (ref5 = nums.res1) && ref5 <= 100))) {
       within = false;
       showLimitsError("res1FieldUnit", "1...100");
     }
@@ -131,15 +131,13 @@
     var footer, results;
     footer = document.getElementById('results');
     results = "<pre>";
-    results += `L   = ${r.lmin} uH\n`;
-    results += `Ct  = ${r.ct} pF\n`;
-    results += `Co  = ${r.cout} uF\n`;
-    results += `Rsc = ${r.rsc} Ω\n`;
-    results += `R2  = ${r.r2} KΩ\n`;
-    if (r.rb === "0") {
-      results += "\n";
-    } else {
-      results += `Rb  = ${r.rb} Ω\n`;
+    results += `Lmin = ${r.lmin} uH\n`;
+    results += `Ct   = ${r.ct} pF\n`;
+    results += `Co   = ${r.cout} uF\n`;
+    results += `Rsc  = ${r.rsc} Ω\n`;
+    results += `R2   = ${r.r2} KΩ\n`;
+    if (r.rb !== "0") {
+      results += `Rb   = ${r.rb} Ω\n`;
     }
     results += "</pre>";
     footer.innerHTML = results;
@@ -214,10 +212,5 @@
     results = format_results(lmin, ct, cout, rsc, r2, rb);
     return show_results(results, "Inverter regulator", "inverter.png");
   };
-
-  // ---------------------------------------------------------------------
-
-  // Do this at start up HERE, not in html file anymore
-  clear_results();
 
 }).call(this);
