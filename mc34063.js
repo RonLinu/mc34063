@@ -12,7 +12,7 @@
   calcBtn = document.getElementById('calculate');
 
   calcBtn.onclick = function() {
-    var _, index, key, label, text, values;
+    var _, key, label, values;
     // Read fields values
     values = {
       vin: document.getElementById('vinField').value,
@@ -21,16 +21,11 @@
       freq: document.getElementById('freqField').value,
       res1: document.getElementById('res1Field').value
     };
-// Restore units labels from any previous error messages
+// Restore units labels (from any previous error messages)
     for (key in values) {
       _ = values[key];
       label = document.getElementById(key + "FieldUnit");
-      text = label.innerText;
-      index = text.indexOf(" ");
-      if (index !== -1) {
-        text = text.substring(0, index);
-      }
-      label.innerHTML = text;
+      label.innerHTML = label.innerText.split(" ")[0];
       label.style.color = "black";
     }
     if (validNumbers(values) && withinLimits(values)) {
@@ -75,7 +70,7 @@
       cout: (cout * 1e6).toFixed(0),
       rsc: rsc.toFixed(1),
       r2: r2.toFixed(1),
-      rb: rb.toFixed(1)
+      rb: rb.toFixed(0)
     };
   };
 
@@ -136,15 +131,15 @@
     var footer, results;
     footer = document.getElementById('results');
     results = "<pre>";
-    results += `L&nbsp;&nbsp;&nbsp;= ${r.lmin} uH\n`;
-    results += `Ct&nbsp;&nbsp;= ${r.ct} pF\n`;
-    results += `Co&nbsp;&nbsp;= ${r.cout} uF\n`;
-    results += `Rsc&nbsp;= ${r.rsc} Ω\n`;
-    results += `R2&nbsp;&nbsp;= ${r.r2} KΩ\n`;
-    if (r.rb === "0.0") {
-      results += "&nbsp;\n";
+    results += `L   = ${r.lmin} uH\n`;
+    results += `Ct  = ${r.ct} pF\n`;
+    results += `Co  = ${r.cout} uF\n`;
+    results += `Rsc = ${r.rsc} Ω\n`;
+    results += `R2  = ${r.r2} KΩ\n`;
+    if (r.rb === "0") {
+      results += "\n";
     } else {
-      results += `Rb&nbsp;&nbsp;= ${r.rb} Ω\n`;
+      results += `Rb  = ${r.rb} Ω\n`;
     }
     results += "</pre>";
     footer.innerHTML = results;
