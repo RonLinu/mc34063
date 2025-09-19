@@ -37,8 +37,8 @@
 
 .split.left input {
   margin: 8px 0;
-  width: 20%;                   /* Or desired width */
-  max-width: 300px;             /* Optional max width */
+  width: 15%;
+  max-width: 300px;
 }
 
 .split.left button {
@@ -47,24 +47,34 @@
   max-width: 300px;             /* Optional max width */
 }
 
-.form-row {
-  margin-bottom: 10px;
-  text-align: center;
-}
 
-.label-right {
-  display: inline-block;
-  width: 220px;
-  text-align: left;
-  margin-right: 10px;
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;  /* space between rows */
 }
 
 .label-left {
-  display: inline-block;
-  width: 180px;
+  width: 130px;          /* fixed width for left label */
   text-align: right;
-  margin-right: 10px;
+  white-space: nowrap;
 }
+
+.label-right {
+  width: 20px;           /* fixed width for unit label */
+  text-align: left;
+  white-space: nowrap;
+}
+
+.label-fixed-width {
+  width: 100px;          /* fixed width for the error label */
+  text-align: left;
+  margin-left: 8px;  /* adjust pixel value as needed for desired spacing */
+  white-space: nowrap;
+  color: red;            /* error label color */
+}
+
 
 #regulator-name {
   text-align: center;

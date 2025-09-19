@@ -21,11 +21,11 @@
       freq: document.getElementById('freqField').value,
       res1: document.getElementById('res1Field').value
     };
-// Restore units labels (from any previous error messages)
+// Clear error messages (if any)
     for (key in values) {
       _ = values[key];
-      label = document.getElementById(key + "FieldUnit");
-      label.innerHTML = label.innerText.split(" ")[0];
+      label = document.getElementById(key + "Error");
+      label.innerHTML = "";
       label.style.color = "black";
     }
     if (validNumbers(values) && withinLimits(values)) {
@@ -76,15 +76,14 @@
 
   // --------------------------------------
   validNumbers = function(values) {
-    var good, key, label, unit, value;
+    var good, key, label, value;
     good = true;
     for (key in values) {
       value = values[key];
       if (!isValidFloat(value)) {
         good = false;
-        label = document.getElementById(key + "FieldUnit");
-        unit = label.innerText;
-        label.innerHTML = `${unit} \u2190 invalid number`;
+        label = document.getElementById(key + "Error");
+        label.innerHTML = "Invalid number";
         label.style.color = "darkred";
       }
     }
@@ -95,33 +94,32 @@
   withinLimits = function(values) {
     var nums, ref, ref1, ref2, ref3, ref4, ref5, showLimitsError, within;
     showLimitsError = function(id, msg) {
-      var label, unit;
+      var label;
       label = document.getElementById(id);
-      unit = label.innerText;
-      label.innerHTML = `${unit} \u2190 range ${msg}`;
+      label.innerHTML = `range= ${msg}`;
       return label.style.color = "darkred";
     };
     within = true;
     nums = str_to_float(values);
     if (!((5 <= (ref = nums.vin) && ref <= 40))) {
       within = false;
-      showLimitsError("vinFieldUnit", "5...40");
+      showLimitsError("vinError", "5V \u2194 40V");
     }
     if (!(((-40 <= (ref1 = nums.vout) && ref1 <= -3)) || ((3 <= (ref2 = nums.vout) && ref2 <= 40)))) {
       within = false;
-      showLimitsError("voutFieldUnit", "-40..-3 or 3..40");
+      showLimitsError("voutError", "-40V \u2194 -3V or 3V \u2194 40V");
     }
     if (!((5 <= (ref3 = nums.iout) && ref3 <= 1000))) {
       within = false;
-      showLimitsError("ioutFieldUnit", "5...1000");
+      showLimitsError("ioutError", "5ma \u2194 1000mA");
     }
     if (!((25 <= (ref4 = nums.freq) && ref4 <= 500))) {
       within = false;
-      showLimitsError("freqFieldUnit", "25...500");
+      showLimitsError("freqError", "25KHz \u2194 500KHz");
     }
     if (!((1 <= (ref5 = nums.res1) && ref5 <= 100))) {
       within = false;
-      showLimitsError("res1FieldUnit", "1...100");
+      showLimitsError("res1Error", "1K \u2194 100K");
     }
     return within;
   };

@@ -16,11 +16,11 @@ calcBtn.onclick = ->
         freq : document.getElementById('freqField').value
         res1 : document.getElementById('res1Field').value
 
-    # Restore units labels (from any previous error messages)
+    # Clear error messages (if any)
     for key, _ of values
-        label = document.getElementById(key+"FieldUnit")
-        label.innerHTML = label.innerText.split(" ")[0]
-        label.style.color = "black" 
+        label = document.getElementById(key+"Error")
+        label.innerHTML = ""
+        label.style.color = "black"
 
     if validNumbers(values) and withinLimits(values)
         calculate values
@@ -62,12 +62,11 @@ validNumbers = (values) ->
     good = true
 
     for key, value of values
-        unless isValidFloat(value)
+        if not isValidFloat(value)
             good = false
-            label = document.getElementById(key+"FieldUnit")
-            unit = label.innerText
-            label.innerHTML = "#{unit} \u2190 invalid number"
-            label.style.color = "darkred" 
+            label = document.getElementById(key+"Error")
+            label.innerHTML = "Invalid number"
+            label.style.color = "darkred"
 
     good
 
@@ -75,31 +74,30 @@ validNumbers = (values) ->
 withinLimits = (values) ->
     showLimitsError = (id, msg) ->
         label = document.getElementById(id)
-        unit = label.innerText
-        label.innerHTML = "#{unit} \u2190 range #{msg}"
-        label.style.color = "darkred" 
+        label.innerHTML = "range= #{msg}"
+        label.style.color = "darkred"
 
     within = true
     nums = str_to_float values
 
-    unless (5 <= nums.vin <= 40)
+    if not (5 <= nums.vin <= 40)
         within = false
-        showLimitsError "vinFieldUnit", "5...40"
-        
-    unless (-40 <= nums.vout <= -3) or (3 <= nums.vout <= 40)
+        showLimitsError "vinError", "5V \u2194 40V"
+
+    if not ((-40 <= nums.vout <= -3) or (3 <= nums.vout <= 40))
          within = false
-         showLimitsError "voutFieldUnit", "-40..-3 or 3..40"
-    
-    unless (5 <= nums.iout <= 1000)
+         showLimitsError "voutError", "-40V \u2194 -3V or 3V \u2194 40V"
+
+    if not (5 <= nums.iout <= 1000)
         within = false
-        showLimitsError "ioutFieldUnit", "5...1000"
-    unless (25 <= nums.freq <= 500)
+        showLimitsError "ioutError", "5ma \u2194 1000mA"
+    if not (25 <= nums.freq <= 500)
         within = false
-        showLimitsError "freqFieldUnit", "25...500"
-    unless (1 <= nums.res1 <= 100)
+        showLimitsError "freqError", "25KHz \u2194 500KHz"
+    if not (1 <= nums.res1 <= 100)
         within = false
-        showLimitsError "res1FieldUnit", "1...100"
-        
+        showLimitsError "res1Error", "1K \u2194 100K"
+
     within
 
 # --------------------------------------
