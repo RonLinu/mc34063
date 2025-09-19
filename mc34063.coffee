@@ -17,21 +17,21 @@ calcBtn.onclick = ->
         res1 : document.getElementById('res1Field').value
 
     # Clear error messages (if any)
+    clear_results values
+
+    if validNumbers(values) and withinLimits(values)
+        calculate values
+
+# --------------------------------------
+clear_results = (values) ->
+    document.getElementById('results').innerHTML = ""
+    document.getElementById('regulator-name').innerHTML = "Regulator name"
+    document.getElementById('theImage').src = "mc34063/splash.png"
+
     for key, _ of values
         label = document.getElementById(key+"Error")
         label.innerHTML = ""
         label.style.color = "black"
-
-    if validNumbers(values) and withinLimits(values)
-        calculate values
-    else
-        clear_results()
-
-# --------------------------------------
-clear_results = ->
-    document.getElementById('results').innerHTML = ""
-    document.getElementById('regulator-name').innerHTML = "Regulator name"
-    document.getElementById('theImage').src = "mc34063/splash.png"
 
 # --------------------------------------
 isValidFloat = (str) ->
@@ -52,53 +52,64 @@ format_results = (lmin, ct, cout, rsc, r2, rb) ->
     results =
         lmin : (lmin * 1e6).toFixed(0)
         ct   : (ct * 1e12).toFixed(0)
-        cout : (cout * 1e6).toFixed(0)
+        cout : (cout * 1e6).toFixed(0)  
         rsc  : rsc.toFixed(1)
         r2   : r2.toFixed(1)
         rb   : rb.toFixed(0)
 
 # --------------------------------------
 validNumbers = (values) ->
-    good = true
+    count = 0
 
     for key, value of values
         if not isValidFloat(value)
-            good = false
-            label = document.getElementById(key+"Error")
+            count++
+            label = document.getElementById(key + "Error")
             label.innerHTML = "Invalid number"
             label.style.color = "darkred"
 
-    good
+    if count != 0
+        msg = "<br>#{count} field has an invalid number"
+        if count > 1 then msg = msg.replace("field has","fields have")
+        document.getElementById('results').innerHTML = msg
+
+    return count == 0   # true if all values are valid numbers
 
 # --------------------------------------
 withinLimits = (values) ->
     showLimitsError = (id, msg) ->
-        label = document.getElementById(id)
+        label = document.getElementById(id + "Error")
         label.innerHTML = "range= #{msg}"
         label.style.color = "darkred"
 
     within = true
+    count = 0
     nums = str_to_float values
 
     if not (5 <= nums.vin <= 40)
-        within = false
-        showLimitsError "vinError", "5V \u2194 40V"
+        count++
+        showLimitsError "vin", "5V \u2194 40V"
 
     if not ((-40 <= nums.vout <= -3) or (3 <= nums.vout <= 40))
-         within = false
-         showLimitsError "voutError", "-40V \u2194 -3V or 3V \u2194 40V"
+         count++
+         showLimitsError "vout", "-40V \u2194 -3V or 3V \u2194 40V"
 
     if not (5 <= nums.iout <= 1000)
-        within = false
-        showLimitsError "ioutError", "5ma \u2194 1000mA"
+        count++
+        showLimitsError "iout", "5ma \u2194 1000mA"
     if not (25 <= nums.freq <= 500)
-        within = false
-        showLimitsError "freqError", "25KHz \u2194 500KHz"
-    if not (1 <= nums.res1 <= 100)
-        within = false
-        showLimitsError "res1Error", "1K \u2194 100K"
+        count++
+        showLimitsError "freq", "25KHz \u2194 500KHz"
+    if not (1 <= nums.res1 <= 50)
+        count++
+        showLimitsError "res1", "1K \u2194 50K"
 
-    within
+    if count != 0
+        msg = "<br>#{count} field has a value out of range"
+        if count > 1 then msg = msg.replace("field has","fields have")
+        document.getElementById('results').innerHTML = msg
+        
+    return count == 0   # true if all numbers are in range
 
 # --------------------------------------
 show_results = (r, name, schematic) ->

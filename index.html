@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!-- MC34063 -->
+<html lang="en">
+<head>
+    <title>MC34063</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="mc34063.css">
+    <meta name="viewport" content="width=900px, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="mc34063/calculator.png">
+    <script defer src="mc34063.js"></script>
+</head>
+
+<body>
+  <div class="split left">
+    <div class="left-content">
+      <h2 class="heading-center">MC34063 calculator</h2>
+    </div>
+    
+    <form>
+      <div class="form-row">
+        <label for="inputVoltage" class="label-left">Input voltage</label>
+        <input type="text" id="vinField" name="inputVoltage" value="24">
+        <label for="inputVoltage" class="label-right" id="vinFieldUnit" >V</label>
+        <label for="inputVoltage" class="label-fixed-width" id="vinError"> </label>
+      </div>
+      <div class="form-row">
+        <label for="outputVoltage" class="label-left">Output voltage</label>
+        <input type="text" id="voutField" name="outputVoltage" value="5">
+        <label for="outputVoltage" class="label-right" id="voutFieldUnit" >V</label>
+        <label for="ouputVoltage" class="label-fixed-width" id="voutError"> </label>
+      </div>
+      <div class="form-row">
+        <label for="outputCurrent" class="label-left">Output current</label>
+        <input type="text" id="ioutField" name="outputCurrent" value="100">
+        <label for="outputCurrent" class="label-right" id="ioutFieldUnit">mA</label>
+        <label for="outputCurrent" class="label-fixed-width" id="ioutError"> </label>
+      </div>
+      <div class="form-row">
+        <label for="frequency" class="label-left">Frequency</label>
+        <input type="text" id="freqField" name="frequency" value="25">
+        <label for="frequency" class="label-right" id="freqFieldUnit">KHz</label>
+        <label for="frequency" class="label-fixed-width" id="freqError"> </label>
+      </div>
+      <div class="form-row">
+        <label for="resistorR1" class="label-left">Resistor R1</label>
+        <input type="text" id="res1Field" name="resistorR1" value="1">
+        <label for="resistorR1" class="label-right" id="res1FieldUnit">KΩ</label>
+        <label for="resistorR1" class="label-fixed-width" id="res1Error"> </label>
+      </div>
+    </form>
+
+    <button id="calculate" type="button">Calculate</button>
+
+    <div id="results" style="font-size: 16px;"></div>     
+    
+    </div>  <!-- end of split left -->
+    
+      
+    <div class="split right">
+        <div>
+            <p id="regulator-name">Regulator name</p>
+        </div>
+
+    <div id="schematic">
+         <img id="theImage" src="mc34063/splash.png" alt="Regulator schematic">
+    </div>
+        
+    </div>
+</body>
+</html>

@@ -12,7 +12,7 @@
   calcBtn = document.getElementById('calculate');
 
   calcBtn.onclick = function() {
-    var _, key, label, values;
+    var values;
     // Read fields values
     values = {
       vin: document.getElementById('vinField').value,
@@ -21,25 +21,27 @@
       freq: document.getElementById('freqField').value,
       res1: document.getElementById('res1Field').value
     };
-// Clear error messages (if any)
-    for (key in values) {
-      _ = values[key];
-      label = document.getElementById(key + "Error");
-      label.innerHTML = "";
-      label.style.color = "black";
-    }
+    // Clear error messages (if any)
+    clear_results(values);
     if (validNumbers(values) && withinLimits(values)) {
       return calculate(values);
-    } else {
-      return clear_results();
     }
   };
 
   // --------------------------------------
-  clear_results = function() {
+  clear_results = function(values) {
+    var _, key, label, results1;
     document.getElementById('results').innerHTML = "";
     document.getElementById('regulator-name').innerHTML = "Regulator name";
-    return document.getElementById('theImage').src = "mc34063/splash.png";
+    document.getElementById('theImage').src = "mc34063/splash.png";
+    results1 = [];
+    for (key in values) {
+      _ = values[key];
+      label = document.getElementById(key + "Error");
+      label.innerHTML = "";
+      results1.push(label.style.color = "black");
+    }
+    return results1;
   };
 
   // --------------------------------------
@@ -76,54 +78,71 @@
 
   // --------------------------------------
   validNumbers = function(values) {
-    var good, key, label, value;
-    good = true;
+    var count, key, label, msg, value;
+    count = 0;
     for (key in values) {
       value = values[key];
       if (!isValidFloat(value)) {
-        good = false;
+        count++;
         label = document.getElementById(key + "Error");
         label.innerHTML = "Invalid number";
         label.style.color = "darkred";
       }
     }
-    return good;
+    if (count !== 0) {
+      msg = `<br>${count} field has an invalid number`;
+      if (count > 1) {
+        msg = msg.replace("field has", "fields have");
+      }
+      document.getElementById('results').innerHTML = msg;
+    }
+    return count === 0; // true if all values are valid numbers
   };
 
+  
   // --------------------------------------
   withinLimits = function(values) {
-    var nums, ref, ref1, ref2, ref3, ref4, ref5, showLimitsError, within;
+    var count, msg, nums, ref, ref1, ref2, ref3, ref4, ref5, showLimitsError, within;
     showLimitsError = function(id, msg) {
       var label;
-      label = document.getElementById(id);
+      label = document.getElementById(id + "Error");
       label.innerHTML = `range= ${msg}`;
       return label.style.color = "darkred";
     };
     within = true;
+    count = 0;
     nums = str_to_float(values);
     if (!((5 <= (ref = nums.vin) && ref <= 40))) {
-      within = false;
-      showLimitsError("vinError", "5V \u2194 40V");
+      count++;
+      showLimitsError("vin", "5V \u2194 40V");
     }
     if (!(((-40 <= (ref1 = nums.vout) && ref1 <= -3)) || ((3 <= (ref2 = nums.vout) && ref2 <= 40)))) {
-      within = false;
-      showLimitsError("voutError", "-40V \u2194 -3V or 3V \u2194 40V");
+      count++;
+      showLimitsError("vout", "-40V \u2194 -3V or 3V \u2194 40V");
     }
     if (!((5 <= (ref3 = nums.iout) && ref3 <= 1000))) {
-      within = false;
-      showLimitsError("ioutError", "5ma \u2194 1000mA");
+      count++;
+      showLimitsError("iout", "5ma \u2194 1000mA");
     }
     if (!((25 <= (ref4 = nums.freq) && ref4 <= 500))) {
-      within = false;
-      showLimitsError("freqError", "25KHz \u2194 500KHz");
+      count++;
+      showLimitsError("freq", "25KHz \u2194 500KHz");
     }
-    if (!((1 <= (ref5 = nums.res1) && ref5 <= 100))) {
-      within = false;
-      showLimitsError("res1Error", "1K \u2194 100K");
+    if (!((1 <= (ref5 = nums.res1) && ref5 <= 50))) {
+      count++;
+      showLimitsError("res1", "1K \u2194 50K");
     }
-    return within;
+    if (count !== 0) {
+      msg = `<br>${count} field has a value out of range`;
+      if (count > 1) {
+        msg = msg.replace("field has", "fields have");
+      }
+      document.getElementById('results').innerHTML = msg;
+    }
+    return count === 0; // true if all numbers are in range
   };
 
+  
   // --------------------------------------
   show_results = function(r, name, schematic) {
     var footer, results;
