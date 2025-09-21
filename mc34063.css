@@ -1,28 +1,10 @@
 
-@media (max-width: 480px) {
-  .right {
-    display: none;
-  }
-
-  .left {
-    width: 100%;
-    position: relative; /* or static if preferred */
-  }
-}
-
-
 .split {
   height: 100%;
   width: 50%;
   position: fixed;
   top: 0;
   overflow-x: hidden;
-}
-
-.left {
-  left: 0;
-  background-color: LightCyan;
-  color: black;
 }
 
 .right {
@@ -37,6 +19,27 @@
   margin-right: auto;
   width: 80%;
 }
+
+/* For mobile devices only: don't show schematic right section */
+@media (max-width: 480px) {
+  .split {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+  .right {
+    display: none; /*  none for hiding */
+    width: 100%;
+    position: relative;
+  }
+}
+
+.left {
+  left: 0;
+  background-color: LightCyan;
+  color: black;
+}
+
 
 .split.left {
   display: flex;
@@ -58,7 +61,6 @@
   width: 30%;                   /* Or desired width */
   max-width: 300px;             /* Optional max width */
 }
-
 
 .form-row {
   display: flex;
