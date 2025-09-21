@@ -89,10 +89,10 @@
         label.style.color = "darkred";
       }
     }
-    if (count !== 0) {
-      msg = `<br>${count} field has an invalid number`;
+    if (count > 0) {
+      msg = "<br>One field has an invalid number";
       if (count > 1) {
-        msg = msg.replace("field has", "fields have");
+        msg = msg.replace("One field has", `${count} fields have`);
       }
       document.getElementById('results').innerHTML = msg;
     }
@@ -132,10 +132,10 @@
       count++;
       showLimitsError("res1", "1K \u2194 50K");
     }
-    if (count !== 0) {
-      msg = `<br>${count} field has a value out of range`;
+    if (count > 0) {
+      msg = "<br>One field has a value out of range";
       if (count > 1) {
-        msg = msg.replace("field has", "fields have");
+        msg = msg.replace("One field has", `${count} fields have`);
       }
       document.getElementById('results').innerHTML = msg;
     }

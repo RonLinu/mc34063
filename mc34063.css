@@ -73,6 +73,7 @@
   margin-left: 8px;  /* adjust pixel value as needed for desired spacing */
   white-space: nowrap;
   color: red;            /* error label color */
+  font-weight: bold;
 }
 
 

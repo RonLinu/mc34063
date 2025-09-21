@@ -5,7 +5,7 @@ RIPPLE = 0.1  # default ripple in volts
 window.onload = ->
   document.getElementById('vinField').focus()
 
-calcBtn = document.getElementById 'calculate'
+calcBtn = document.getElementById('calculate')
 
 calcBtn.onclick = ->
     # Read fields values
@@ -68,9 +68,9 @@ validNumbers = (values) ->
             label.innerHTML = "Invalid number"
             label.style.color = "darkred"
 
-    if count != 0
-        msg = "<br>#{count} field has an invalid number"
-        if count > 1 then msg = msg.replace("field has","fields have")
+    if count > 0
+        msg = "<br>One field has an invalid number"
+        if count > 1 then msg = msg.replace("One field has","#{count} fields have")
         document.getElementById('results').innerHTML = msg
 
     return count == 0   # true if all values are valid numbers
@@ -84,7 +84,7 @@ withinLimits = (values) ->
 
     within = true
     count = 0
-    nums = str_to_float values
+    nums = str_to_float(values)
 
     if not (5 <= nums.vin <= 40)
         count++
@@ -104,16 +104,16 @@ withinLimits = (values) ->
         count++
         showLimitsError "res1", "1K \u2194 50K"
 
-    if count != 0
-        msg = "<br>#{count} field has a value out of range"
-        if count > 1 then msg = msg.replace("field has","fields have")
+    if count > 0
+        msg = "<br>One field has a value out of range"
+        if count > 1 then msg = msg.replace("One field has","#{count} fields have")
         document.getElementById('results').innerHTML = msg
         
     return count == 0   # true if all numbers are in range
 
 # --------------------------------------
 show_results = (r, name, schematic) ->
-    footer = document.getElementById 'results'
+    footer = document.getElementById('results')
     results = "<pre>"
     results += "Lmin = #{r.lmin} uH\n"
     results += "Ct   = #{r.ct} pF\n"
@@ -129,7 +129,7 @@ show_results = (r, name, schematic) ->
 
 # --------------------------------------
 calculate = (values) ->
-    nums = str_to_float values
+    nums = str_to_float(values)
 
     if nums.vout < 0
         inverter nums
