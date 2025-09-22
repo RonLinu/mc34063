@@ -32,9 +32,9 @@
   clear_results = function(values) {
     var _, field, key, results1;
     document.getElementById('results').innerHTML = "";
+    document.getElementById("results").style.color = "";
     document.getElementById('regulator-name').innerHTML = "Regulator name";
     document.getElementById('theImage').src = "mc34063/splash.png";
-    document.getElementById("results").style.color = "";
     results1 = [];
     for (key in values) {
       _ = values[key];
@@ -88,11 +88,9 @@
         field.style.backgroundColor = "LightPink";
       }
     }
-    if (count > 0) {
-      msg = "<br>\u2192 Invalid number in one field \u2190";
-      if (count > 1) {
-        msg = msg.replace("one field", `${count} fields`);
-      }
+    if (count) {
+      msg = "<br>Invalid number in ";
+      msg += count === 1 ? "one field" : `${count} fields`;
       document.getElementById('results').innerHTML = msg;
       document.getElementById("results").style.color = "DarkRed";
     }
@@ -126,11 +124,9 @@
     if (!((1 <= (ref5 = nums.res1) && ref5 <= 50))) {
       showLimitsError("res1Field");
     }
-    if (count > 0) {
-      msg = "<br>\u2192 Value out of range in one field \u2190";
-      if (count > 1) {
-        msg = msg.replace("one field", `${count} fields`);
-      }
+    if (count) {
+      msg = "<br>Value out of range in ";
+      msg += count === 1 ? "one field" : `${count} fields`;
       document.getElementById('results').innerHTML = msg;
       document.getElementById("results").style.color = "DarkRed";
     }

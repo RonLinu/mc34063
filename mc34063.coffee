@@ -25,10 +25,9 @@ calcBtn.onclick = ->
 # --------------------------------------
 clear_results = (values) ->
     document.getElementById('results').innerHTML = ""
+    document.getElementById("results").style.color = ""
     document.getElementById('regulator-name').innerHTML = "Regulator name"
     document.getElementById('theImage').src = "mc34063/splash.png"
-    document.getElementById("results").style.color = ""
-
 
     for key, _ of values
         field = document.getElementById(key + "Field")
@@ -68,9 +67,9 @@ validNumbers = (values) ->
             field = document.getElementById(key + "Field")
             field.style.backgroundColor = "LightPink";
 
-    if count > 0
-        msg = "<br>\u2192 Invalid number in one field \u2190"
-        if count > 1 then msg = msg.replace("one field","#{count} fields")
+    if count
+        msg = "<br>Invalid number in "
+        msg += if count == 1 then "one field" else "#{count} fields"
         document.getElementById('results').innerHTML = msg
         document.getElementById("results").style.color = "DarkRed"
 
@@ -101,9 +100,9 @@ withinLimits = (values) ->
     if not (1 <= nums.res1 <= 50)
         showLimitsError "res1Field"
 
-    if count > 0
-        msg = "<br>\u2192 Value out of range in one field \u2190"
-        if count > 1 then msg = msg.replace("one field","#{count} fields")
+    if count
+        msg = "<br>Value out of range in "
+        msg += if count == 1 then "one field" else "#{count} fields"
         document.getElementById('results').innerHTML = msg
         document.getElementById("results").style.color = "DarkRed"
         

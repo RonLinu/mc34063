@@ -1,3 +1,6 @@
+body {
+  font-weight: bold;
+}
 
 .split {
   height: 100%;
@@ -79,6 +82,7 @@
   width: 20px;           /* fixed width for unit label */
   text-align: left;
   white-space: nowrap;
+  font-size: 16px;
 }
 
 .label-range {
@@ -86,8 +90,8 @@
   text-align: left;
   margin-left: 8px;  /* adjust pixel value as needed for desired spacing */
   white-space: nowrap;
-  color: gray;            /* error label color */
-  font-weight: bold;
+  color: green;            /* error label color */
+  font-size: 16px;
 }
 
 #results {
