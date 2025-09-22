@@ -27,11 +27,12 @@ clear_results = (values) ->
     document.getElementById('results').innerHTML = ""
     document.getElementById('regulator-name').innerHTML = "Regulator name"
     document.getElementById('theImage').src = "mc34063/splash.png"
+    document.getElementById("results").style.color = ""
+
 
     for key, _ of values
-        label = document.getElementById(key+"Error")
-        label.innerHTML = ""
-        label.style.color = "black"
+        field = document.getElementById(key + "Field")
+        field.style.backgroundColor = ""
 
 # --------------------------------------
 isValidFloat = (str) ->
@@ -64,50 +65,47 @@ validNumbers = (values) ->
     for key, value of values
         if not isValidFloat(value)
             count++
-            label = document.getElementById(key + "Error")
-            label.innerHTML = "Invalid number"
-            label.style.color = "darkred"
+            field = document.getElementById(key + "Field")
+            field.style.backgroundColor = "LightPink";
 
     if count > 0
-        msg = "<br>One field has an invalid number"
-        if count > 1 then msg = msg.replace("One field has","#{count} fields have")
+        msg = "<br>\u2192 Invalid number in one field \u2190"
+        if count > 1 then msg = msg.replace("one field","#{count} fields")
         document.getElementById('results').innerHTML = msg
+        document.getElementById("results").style.color = "DarkRed"
 
     return count == 0   # true if all values are valid numbers
 
 # --------------------------------------
 withinLimits = (values) ->
-    showLimitsError = (id, msg) ->
-        label = document.getElementById(id + "Error")
-        label.innerHTML = "range= #{msg}"
-        label.style.color = "darkred"
+    showLimitsError = (id) ->
+        count++
+        field = document.getElementById(id)
+        field.style.backgroundColor = "LightPink";
 
-    within = true
     count = 0
     nums = str_to_float(values)
 
     if not (5 <= nums.vin <= 40)
-        count++
-        showLimitsError "vin", "5V \u2194 40V"
+        showLimitsError "vinField"
 
     if not ((-40 <= nums.vout <= -3) or (3 <= nums.vout <= 40))
-         count++
-         showLimitsError "vout", "-40V \u2194 -3V or 3V \u2194 40V"
+         showLimitsError "voutField"
 
     if not (5 <= nums.iout <= 1000)
-        count++
-        showLimitsError "iout", "5ma \u2194 1000mA"
-    if not (25 <= nums.freq <= 500)
-        count++
-        showLimitsError "freq", "25KHz \u2194 500KHz"
+        showLimitsError "ioutField"
+        
+    if not (20 <= nums.freq <= 100)
+        showLimitsError "freqField"
+        
     if not (1 <= nums.res1 <= 50)
-        count++
-        showLimitsError "res1", "1K \u2194 50K"
+        showLimitsError "res1Field"
 
     if count > 0
-        msg = "<br>One field has a value out of range"
-        if count > 1 then msg = msg.replace("One field has","#{count} fields have")
+        msg = "<br>\u2192 Value out of range in one field \u2190"
+        if count > 1 then msg = msg.replace("one field","#{count} fields")
         document.getElementById('results').innerHTML = msg
+        document.getElementById("results").style.color = "DarkRed"
         
     return count == 0   # true if all numbers are in range
 
@@ -148,7 +146,7 @@ step_down = (n) ->
 
     lmin  = (n.vin - 1 - n.vout) / ipeak * ton_max
     ct    = ton_max * 4e-5
-    cout  = ipeak * tontoff / (8 * RIPPLE)
+    cout  = (ipeak * tontoff) / (8 * RIPPLE)
     rsc   = 0.33 / ipeak
     r2    = (n.vout - 1.25) / 1.25 * n.res1    # R1 & R2 are in Kohms
     rb    = 0.0
@@ -167,7 +165,7 @@ step_up = (n) ->
 
     lmin  = (n.vin - 1) / ipeak * ton_max
     ct    = ton_max * 4e-5
-    cout  = (n.iout / 1e3 * ton_max / RIPPLE) * 9
+    cout  = (n.iout / 1e3 * ton_max) / RIPPLE
     rsc   = 0.33 / ipeak
     r2    = ((n.vout - 1.25) / 1.25) * n.res1
     rb    = ((n.vin - 1) - ipeak) * rsc / ib
@@ -185,7 +183,7 @@ inverter = (n) ->
 
     lmin  = (n.vin - 0.8) / ipeak * ton_max
     ct    = ton_max * 4e-5
-    cout  = (n.iout / 1e3 * ton_max / RIPPLE) * 9
+    cout  = (n.iout / 1e3 * ton_max) / RIPPLE
     rsc   = 0.33 / ipeak
     r2    = ( (Math.abs(n.vout) - 1.25) / 1.25) * n.res1
     rb    = 0

@@ -30,16 +30,16 @@
 
   // --------------------------------------
   clear_results = function(values) {
-    var _, key, label, results1;
+    var _, field, key, results1;
     document.getElementById('results').innerHTML = "";
     document.getElementById('regulator-name').innerHTML = "Regulator name";
     document.getElementById('theImage').src = "mc34063/splash.png";
+    document.getElementById("results").style.color = "";
     results1 = [];
     for (key in values) {
       _ = values[key];
-      label = document.getElementById(key + "Error");
-      label.innerHTML = "";
-      results1.push(label.style.color = "black");
+      field = document.getElementById(key + "Field");
+      results1.push(field.style.backgroundColor = "");
     }
     return results1;
   };
@@ -78,23 +78,23 @@
 
   // --------------------------------------
   validNumbers = function(values) {
-    var count, key, label, msg, value;
+    var count, field, key, msg, value;
     count = 0;
     for (key in values) {
       value = values[key];
       if (!isValidFloat(value)) {
         count++;
-        label = document.getElementById(key + "Error");
-        label.innerHTML = "Invalid number";
-        label.style.color = "darkred";
+        field = document.getElementById(key + "Field");
+        field.style.backgroundColor = "LightPink";
       }
     }
     if (count > 0) {
-      msg = "<br>One field has an invalid number";
+      msg = "<br>\u2192 Invalid number in one field \u2190";
       if (count > 1) {
-        msg = msg.replace("One field has", `${count} fields have`);
+        msg = msg.replace("one field", `${count} fields`);
       }
       document.getElementById('results').innerHTML = msg;
+      document.getElementById("results").style.color = "DarkRed";
     }
     return count === 0; // true if all values are valid numbers
   };
@@ -102,42 +102,37 @@
   
   // --------------------------------------
   withinLimits = function(values) {
-    var count, msg, nums, ref, ref1, ref2, ref3, ref4, ref5, showLimitsError, within;
-    showLimitsError = function(id, msg) {
-      var label;
-      label = document.getElementById(id + "Error");
-      label.innerHTML = `range= ${msg}`;
-      return label.style.color = "darkred";
+    var count, msg, nums, ref, ref1, ref2, ref3, ref4, ref5, showLimitsError;
+    showLimitsError = function(id) {
+      var field;
+      count++;
+      field = document.getElementById(id);
+      return field.style.backgroundColor = "LightPink";
     };
-    within = true;
     count = 0;
     nums = str_to_float(values);
     if (!((5 <= (ref = nums.vin) && ref <= 40))) {
-      count++;
-      showLimitsError("vin", "5V \u2194 40V");
+      showLimitsError("vinField");
     }
     if (!(((-40 <= (ref1 = nums.vout) && ref1 <= -3)) || ((3 <= (ref2 = nums.vout) && ref2 <= 40)))) {
-      count++;
-      showLimitsError("vout", "-40V \u2194 -3V or 3V \u2194 40V");
+      showLimitsError("voutField");
     }
     if (!((5 <= (ref3 = nums.iout) && ref3 <= 1000))) {
-      count++;
-      showLimitsError("iout", "5ma \u2194 1000mA");
+      showLimitsError("ioutField");
     }
-    if (!((25 <= (ref4 = nums.freq) && ref4 <= 500))) {
-      count++;
-      showLimitsError("freq", "25KHz \u2194 500KHz");
+    if (!((20 <= (ref4 = nums.freq) && ref4 <= 100))) {
+      showLimitsError("freqField");
     }
     if (!((1 <= (ref5 = nums.res1) && ref5 <= 50))) {
-      count++;
-      showLimitsError("res1", "1K \u2194 50K");
+      showLimitsError("res1Field");
     }
     if (count > 0) {
-      msg = "<br>One field has a value out of range";
+      msg = "<br>\u2192 Value out of range in one field \u2190";
       if (count > 1) {
-        msg = msg.replace("One field has", `${count} fields have`);
+        msg = msg.replace("one field", `${count} fields`);
       }
       document.getElementById('results').innerHTML = msg;
+      document.getElementById("results").style.color = "DarkRed";
     }
     return count === 0; // true if all numbers are in range
   };
@@ -185,7 +180,7 @@
     ipeak = n.iout / 1e3 * 2.0;
     lmin = (n.vin - 1 - n.vout) / ipeak * ton_max;
     ct = ton_max * 4e-5;
-    cout = ipeak * tontoff / (8 * RIPPLE);
+    cout = (ipeak * tontoff) / (8 * RIPPLE);
     rsc = 0.33 / ipeak;
     r2 = (n.vout - 1.25) / 1.25 * n.res1; // R1 & R2 are in Kohms
     rb = 0.0;
@@ -204,7 +199,7 @@
     ib = ipeak / 20 + 5e-3;
     lmin = (n.vin - 1) / ipeak * ton_max;
     ct = ton_max * 4e-5;
-    cout = (n.iout / 1e3 * ton_max / RIPPLE) * 9;
+    cout = (n.iout / 1e3 * ton_max) / RIPPLE;
     rsc = 0.33 / ipeak;
     r2 = ((n.vout - 1.25) / 1.25) * n.res1;
     rb = ((n.vin - 1) - ipeak) * rsc / ib;
@@ -222,7 +217,7 @@
     ipeak = n.iout / 1e3 * 2.0;
     lmin = (n.vin - 0.8) / ipeak * ton_max;
     ct = ton_max * 4e-5;
-    cout = (n.iout / 1e3 * ton_max / RIPPLE) * 9;
+    cout = (n.iout / 1e3 * ton_max) / RIPPLE;
     rsc = 0.33 / ipeak;
     r2 = ((Math.abs(n.vout) - 1.25) / 1.25) * n.res1;
     rb = 0;

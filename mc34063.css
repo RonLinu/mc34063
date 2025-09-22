@@ -81,15 +81,18 @@
   white-space: nowrap;
 }
 
-.label-fixed-width {
+.label-range {
   width: 100px;          /* fixed width for the error label */
   text-align: left;
   margin-left: 8px;  /* adjust pixel value as needed for desired spacing */
   white-space: nowrap;
-  color: red;            /* error label color */
+  color: gray;            /* error label color */
   font-weight: bold;
 }
 
+#results {
+  font-size: 16px;
+}
 
 #regulator-name {
   text-align: center;
