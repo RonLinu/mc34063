@@ -19,31 +19,31 @@
     <form>
       <div class="form-row">
         <label for="inputVoltage" class="label-left">Input voltage</label>
-        <input type="text" id="vinField" name="inputVoltage" value="24">
+    <input type="number" pattern="[0-9]*" inputmode="numeric" id="vinField" value="24">
         <label for="inputVoltage" class="label-right" id="vinFieldUnit" >V</label>
         <label for="inputVoltage" class="label-range" id="vinError">[5...40]</label>
       </div>
       <div class="form-row">
         <label for="outputVoltage" class="label-left">Output voltage</label>
-        <input type="text" id="voutField" name="outputVoltage" value="5">
+    <input type="number" pattern="[0-9]*" inputmode="numeric" id="voutField" value="5">
         <label for="outputVoltage" class="label-right" id="voutFieldUnit" >V</label>
-        <label for="ouputVoltage" class="label-range" id="voutError">[-40...-3] or [3...40]</label>
+        <label for="ouputVoltage" class="label-range" id="voutError">[-40...-3] [3...40]</label>
       </div>
       <div class="form-row">
         <label for="outputCurrent" class="label-left">Output current</label>
-        <input type="text" id="ioutField" name="outputCurrent" value="100">
+    <input type="number" pattern="[0-9]*" inputmode="numeric" id="ioutField" value="100">
         <label for="outputCurrent" class="label-right" id="ioutFieldUnit">mA</label>
         <label for="outputCurrent" class="label-range" id="ioutError">[5...1000]</label>
       </div>
       <div class="form-row">
         <label for="frequency" class="label-left">Frequency</label>
-        <input type="text" id="freqField" name="frequency" value="25">
+    <input type="number" pattern="[0-9]*" inputmode="numeric" id="freqField" value="25">
         <label for="frequency" class="label-right" id="freqFieldUnit">KHz</label>
         <label for="frequency" class="label-range" id="freqError">[20...100]</label>
       </div>
       <div class="form-row">
         <label for="resistorR1" class="label-left">Resistor R1</label>
-        <input type="text" id="res1Field" name="resistorR1" value="1">
+    <input type="number" pattern="[0-9]*" inputmode="numeric" id="res1Field" value="1">
         <label for="resistorR1" class="label-right" id="res1FieldUnit">KΩ</label>
         <label for="resistorR1" class="label-range" id="res1Error">[1...50]</label>
       </div>

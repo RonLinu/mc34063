@@ -73,22 +73,21 @@ body {
 }
 
 .label-left {
-  width: 130px;          /* fixed width for left label */
+  width: 130px;
   text-align: right;
   white-space: nowrap;
 }
 
 .label-right {
-  width: 20px;           /* fixed width for unit label */
+  width: 20px;
   text-align: left;
   white-space: nowrap;
   font-size: 16px;
 }
 
 .label-range {
-/*  width: 100px; */
-  text-align: left;
   margin-left: 8px;
+  text-align: left;
   white-space: nowrap;
   color: green;
   font-size: 15px;
@@ -108,7 +107,6 @@ body {
 }
 
 #theImage {
-  width: some-fixed-or-percentage; /* e.g., 60% */
   border: 2px solid black;
 }
 
