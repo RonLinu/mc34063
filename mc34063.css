@@ -93,6 +93,12 @@ body {
   font-size: 15px;
 }
 
+.button-row {
+  display: flex;
+  gap: 10px;
+  width: 400px;
+}
+
 #results {
   font-size: 16px;
 }
