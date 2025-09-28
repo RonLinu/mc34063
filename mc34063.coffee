@@ -14,28 +14,44 @@ window.onload = ->
             document.getElementById( key + "Field").value = value
 
 # --------------------------------------
+showAlert = (title, icon, align, msg) ->
+    new Promise (resolve) ->
+        Swal.fire
+            title: title
+            html: "<div style='text-align: #{align}; font-size: 16px;'>#{msg}</div>"
+            icon: icon
+            confirmButtonText: 'OK'
+            position: 'center'
+            animation: true
+            willClose: resolve
+
+# --------------------------------------
 saveBtn = document.getElementById('save')
 
 saveBtn.onclick = ->
     values = getFieldsValues()
 
-    if validNumbers(values)
-        localStorage.setItem("mc34063", JSON.stringify(values))
-        msg = '<span style="font-weight: normal;">'
-        msg += '<br>The numeric values in fields have been saved as the new defaults'
-        msg += '</span>'
-        footer = document.getElementById('results')
-        footer.style.color = ''
-        footer.innerHTML = msg
-    
+    # Just clear fields from error color, keep any results on screen
+    for key, _ of values
+        field = document.getElementById(key + 'Field')
+        field.style.backgroundColor = ''
+
+    if not validNumbers(values) or not withinLimits(values)
+        clear_results()
+        return
+
+    localStorage.setItem("mc34063", JSON.stringify(values))
+    msg = 'Field values ​​have been saved as new default values'
+    showAlert('', 'info', 'center', msg)
+
 # --------------------------------------
 getFieldsValues = () ->
     values =
-        vin  : document.getElementById('vinField').value
-        vout : document.getElementById('voutField').value
-        iout : document.getElementById('ioutField').value
-        freq : document.getElementById('freqField').value
-        res1 : document.getElementById('res1Field').value
+        vin  : document.getElementById('vinField').value.trim()
+        vout : document.getElementById('voutField').value.trim()
+        iout : document.getElementById('ioutField').value.trim()
+        freq : document.getElementById('freqField').value.trim()
+        res1 : document.getElementById('res1Field').value.trim()
 
 # --------------------------------------
 calcBtn = document.getElementById('calculate')
@@ -98,8 +114,7 @@ validNumbers = (values) ->
     if count
         msg = '<br>Invalid number in '
         msg += if count == 1 then 'one field' else "#{count} fields"
-        document.getElementById('results').innerHTML = msg
-        document.getElementById('results').style.color = 'DarkRed'
+        showAlert('', 'error', 'center', msg)
 
     return count == 0   # true if all values are valid numbers
 
@@ -131,8 +146,7 @@ withinLimits = (values) ->
     if count
         msg = '<br>Value out of range in '
         msg += if count == 1 then 'one field' else "#{count} fields"
-        document.getElementById('results').innerHTML = msg
-        document.getElementById('results').style.color = 'DarkRed'
+        showAlert('', 'info', 'center', msg)
         
     return count == 0   # true if all numbers are in range
 

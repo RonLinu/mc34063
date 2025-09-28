@@ -1,6 +1,6 @@
 (function() {
   // https://ronlinu.github.io/ms34063
-  var RIPPLE, calcBtn, calculate, clear_results, format_results, getFieldsValues, inverter, isValidFloat, saveBtn, show_results, step_down, step_up, str_to_float, validNumbers, withinLimits;
+  var RIPPLE, calcBtn, calculate, clear_results, format_results, getFieldsValues, inverter, isValidFloat, saveBtn, showAlert, show_results, step_down, step_up, str_to_float, validNumbers, withinLimits;
 
   RIPPLE = 0.1; // default ripple in volts
 
@@ -23,32 +23,50 @@
   };
 
   // --------------------------------------
+  showAlert = function(title, icon, align, msg) {
+    return new Promise(function(resolve) {
+      return Swal.fire({
+        title: title,
+        html: `<div style='text-align: ${align}; font-size: 16px;'>${msg}</div>`,
+        icon: icon,
+        confirmButtonText: 'OK',
+        position: 'center',
+        animation: true,
+        willClose: resolve
+      });
+    });
+  };
+
+  // --------------------------------------
   saveBtn = document.getElementById('save');
 
   saveBtn.onclick = function() {
-    var footer, msg, values;
+    var _, field, key, msg, values;
     values = getFieldsValues();
-    if (validNumbers(values)) {
-      localStorage.setItem("mc34063", JSON.stringify(values));
-      msg = '<span style="font-weight: normal;">';
-      msg += '<br>The numeric values in fields have been saved as the new defaults';
-      msg += '</span>';
-      footer = document.getElementById('results');
-      footer.style.color = '';
-      return footer.innerHTML = msg;
+// Just clear fields from error color, keep any results on screen
+    for (key in values) {
+      _ = values[key];
+      field = document.getElementById(key + 'Field');
+      field.style.backgroundColor = '';
     }
+    if (!validNumbers(values) || !withinLimits(values)) {
+      clear_results();
+      return;
+    }
+    localStorage.setItem("mc34063", JSON.stringify(values));
+    msg = 'Field values ​​have been saved as new default values';
+    return showAlert('', 'info', 'center', msg);
   };
 
-  
   // --------------------------------------
   getFieldsValues = function() {
     var values;
     return values = {
-      vin: document.getElementById('vinField').value,
-      vout: document.getElementById('voutField').value,
-      iout: document.getElementById('ioutField').value,
-      freq: document.getElementById('freqField').value,
-      res1: document.getElementById('res1Field').value
+      vin: document.getElementById('vinField').value.trim(),
+      vout: document.getElementById('voutField').value.trim(),
+      iout: document.getElementById('ioutField').value.trim(),
+      freq: document.getElementById('freqField').value.trim(),
+      res1: document.getElementById('res1Field').value.trim()
     };
   };
 
@@ -130,8 +148,7 @@
     if (count) {
       msg = '<br>Invalid number in ';
       msg += count === 1 ? 'one field' : `${count} fields`;
-      document.getElementById('results').innerHTML = msg;
-      document.getElementById('results').style.color = 'DarkRed';
+      showAlert('', 'error', 'center', msg);
     }
     return count === 0; // true if all values are valid numbers
   };
@@ -166,8 +183,7 @@
     if (count) {
       msg = '<br>Value out of range in ';
       msg += count === 1 ? 'one field' : `${count} fields`;
-      document.getElementById('results').innerHTML = msg;
-      document.getElementById('results').style.color = 'DarkRed';
+      showAlert('', 'info', 'center', msg);
     }
     return count === 0; // true if all numbers are in range
   };
