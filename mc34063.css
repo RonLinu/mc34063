@@ -31,7 +31,7 @@ body {
     height: auto;
   }
   .right {
-    display: none; /*  none for hiding */
+    display: block; /*  none for hiding */
     width: 100%;
     position: relative;
   }
@@ -62,7 +62,6 @@ body {
 .split.left button {
   margin: 8px 0;
   width: 50%;
-
 }
 
 .button-row {
@@ -131,3 +130,4 @@ input[type=number] {
 .swal2-popup {
   border-radius: 20px;        /* rounded corners */
 }
+

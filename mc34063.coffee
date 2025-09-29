@@ -8,7 +8,7 @@ window.onload = ->
     # Retrieve saved values from localStorage (if any)
     storedData = localStorage.getItem("mc34063")
     if storedData
-        values = JSON.parse(storedData)
+        values = JSON.parse(storedData)  # un-stringify, back to original object
         # Restore values in the fields
         for key, value of values
             document.getElementById( key + "Field").value = value
@@ -165,6 +165,7 @@ withinLimits = (values) ->
 show_results = (results, name, schematic) ->
     footer = document.getElementById('results')
     resultStr = '<pre>'
+    resultStr += "<u>#{name}</u>\n"
     resultStr += "Lmin = #{results.lmin} uH\n"
     resultStr += "Ct   = #{results.ct} pF\n"
     resultStr += "Co   = #{results.cout} uF\n"
@@ -204,7 +205,7 @@ step_down = (nums) ->
     rb    = 0.0
 
     resultStr = format_results(lmin, ct, cout, rsc, r2, rb)
-    show_results resultStr, 'Stepdown regulator', 'step_down.png'
+    show_results resultStr, 'Step-Down regulator', 'step_down.png'
 
 # --------------------------------------
 step_up = (nums) ->
@@ -223,7 +224,7 @@ step_up = (nums) ->
     rb    = ((nums.vin - 1) - ipeak) * rsc / ib
 
     resultStr = format_results(lmin, ct, cout, rsc, r2, rb)
-    show_results resultStr, 'Stepup regulator', 'step_up.png'
+    show_results resultStr, 'Step-Up regulator', 'step_up.png'
 
 # --------------------------------------
 inverter = (nums) ->

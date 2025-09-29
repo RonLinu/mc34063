@@ -10,7 +10,7 @@ window.onload = function() {
   // Retrieve saved values from localStorage (if any)
   storedData = localStorage.getItem("mc34063");
   if (storedData) {
-    values = JSON.parse(storedData);
+    values = JSON.parse(storedData); // un-stringify, back to original object
 // Restore values in the fields
     results1 = [];
     for (key in values) {
@@ -208,6 +208,7 @@ show_results = function(results, name, schematic) {
   var footer, resultStr;
   footer = document.getElementById('results');
   resultStr = '<pre>';
+  resultStr += `<u>${name}</u>\n`;
   resultStr += `Lmin = ${results.lmin} uH\n`;
   resultStr += `Ct   = ${results.ct} pF\n`;
   resultStr += `Co   = ${results.cout} uF\n`;
@@ -250,7 +251,7 @@ step_down = function(nums) {
   r2 = (nums.vout - 1.25) / 1.25 * nums.res1; // R1 & R2 are in Kohms
   rb = 0.0;
   resultStr = format_results(lmin, ct, cout, rsc, r2, rb);
-  return show_results(resultStr, 'Stepdown regulator', 'step_down.png');
+  return show_results(resultStr, 'Step-Down regulator', 'step_down.png');
 };
 
 // --------------------------------------
@@ -269,7 +270,7 @@ step_up = function(nums) {
   r2 = ((nums.vout - 1.25) / 1.25) * nums.res1;
   rb = ((nums.vin - 1) - ipeak) * rsc / ib;
   resultStr = format_results(lmin, ct, cout, rsc, r2, rb);
-  return show_results(resultStr, 'Stepup regulator', 'step_up.png');
+  return show_results(resultStr, 'Step-Up regulator', 'step_up.png');
 };
 
 // --------------------------------------
