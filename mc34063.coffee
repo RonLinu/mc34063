@@ -21,7 +21,7 @@ showAlert = (title, icon, align, msg) ->
             html: "<div style='text-align: #{align}; font-size: 16px;'>#{msg}</div>"
             icon: icon
             confirmButtonText: 'OK'
-            position: 'center'
+            position: align
             animation: true
             willClose: resolve
 
@@ -60,7 +60,7 @@ calcBtn.onclick = ->
     # Read fields values
     values = getFieldsValues()
     
-    # Clear error messages (if any)
+    # Clear previous results (if any)
     clear_results values
 
     if validNumbers(values) and withinLimits(values)
@@ -69,8 +69,7 @@ calcBtn.onclick = ->
 # --------------------------------------
 # Function to handle input changes
 onInputChange = (event) ->
-    console.log "Field changed:", event.target.id, "New value:", event.target.value
-    # Call your desired function here
+    # If any change in fields
     clear_results()
 
 # Attach event listeners to all input fields in the form
@@ -158,7 +157,7 @@ withinLimits = (values) ->
     if count
         msg = '<br>Value out of range in '
         msg += if count == 1 then 'one field' else "#{count} fields"
-        showAlert('', 'info', 'center', msg)
+        showAlert('', 'error', 'center', msg)
         
     return count == 0   # true if all numbers are in range
 

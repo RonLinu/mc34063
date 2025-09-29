@@ -29,7 +29,7 @@ showAlert = function(title, icon, align, msg) {
       html: `<div style='text-align: ${align}; font-size: 16px;'>${msg}</div>`,
       icon: icon,
       confirmButtonText: 'OK',
-      position: 'center',
+      position: align,
       animation: true,
       willClose: resolve
     });
@@ -77,7 +77,7 @@ calcBtn.onclick = function() {
   // Read fields values
   values = getFieldsValues();
   
-  // Clear error messages (if any)
+  // Clear previous results (if any)
   clear_results(values);
   if (validNumbers(values) && withinLimits(values)) {
     return calculate(values);
@@ -87,8 +87,7 @@ calcBtn.onclick = function() {
 // --------------------------------------
 // Function to handle input changes
 onInputChange = function(event) {
-  console.log("Field changed:", event.target.id, "New value:", event.target.value);
-  // Call your desired function here
+  // If any change in fields
   return clear_results();
 };
 
@@ -198,7 +197,7 @@ withinLimits = function(values) {
   if (count) {
     msg = '<br>Value out of range in ';
     msg += count === 1 ? 'one field' : `${count} fields`;
-    showAlert('', 'info', 'center', msg);
+    showAlert('', 'error', 'center', msg);
   }
   return count === 0; // true if all numbers are in range
 };
