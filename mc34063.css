@@ -127,3 +127,7 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+.swal2-popup {
+  border-radius: 20px;        /* rounded corners */
+}

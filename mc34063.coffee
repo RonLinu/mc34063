@@ -67,6 +67,18 @@ calcBtn.onclick = ->
         calculate values
 
 # --------------------------------------
+# Function to handle input changes
+onInputChange = (event) ->
+    console.log "Field changed:", event.target.id, "New value:", event.target.value
+    # Call your desired function here
+    clear_results()
+
+# Attach event listeners to all input fields in the form
+inputs = document.querySelectorAll 'form input'
+for input in inputs
+    input.addEventListener 'input', onInputChange
+
+# --------------------------------------
 clear_results = (values) ->
     document.getElementById('results').innerHTML = ''
     document.getElementById("results").style.color = ''
