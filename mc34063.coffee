@@ -5,11 +5,11 @@ RIPPLE = 0.1  # default ripple in volts
 window.onload = ->
     document.getElementById('vinField').focus()
     
-    # Retrieve saved values from localStorage (if any)
+    # Retrieve saved values from localStorage
     storedData = localStorage.getItem("mc34063")
     if storedData
-        values = JSON.parse(storedData)  # un-stringify, back to original object
-        # Restore values in the fields
+        # Restore values in all fields
+        values = JSON.parse(storedData)
         for key, value of values
             document.getElementById( key + "Field").value = value
 
@@ -26,20 +26,20 @@ showAlert = (title, icon, align, msg) ->
             willClose: resolve
 
 # --------------------------------------
-saveBtn = document.getElementById('save')
-
-saveBtn.onclick = ->
+document.getElementById('save').onclick = ->
     values = getFieldsValues()
 
-    # Just clear fields from error color, keep any results on screen
-    for key, _ of values
+    # Clear any red background color in fields
+    for key of values
         field = document.getElementById(key + 'Field')
         field.style.backgroundColor = ''
 
-    if not validNumbers(values) or not withinLimits(values)
+    # Accept only valid field values before saving
+    if not areValidNumbers(values) or not areWithinLimits(values)
         clear_results()
         return
-
+    
+    # Save
     localStorage.setItem("mc34063", JSON.stringify(values))
     msg = 'Field values ​​have been saved as new default values'
     showAlert('', 'info', 'center', msg)
@@ -54,25 +54,26 @@ getFieldsValues = () ->
         res1 : document.getElementById('res1Field').value.trim()
 
 # --------------------------------------
-calcBtn = document.getElementById('calculate')
+calculateBtn = document.getElementById('calculate')
 
-calcBtn.onclick = ->
-    # Read fields values
+calculateBtn.onclick = ->
+    # Read field values
     values = getFieldsValues()
     
     # Clear previous results (if any)
     clear_results values
 
-    if validNumbers(values) and withinLimits(values)
+    if areValidNumbers(values) and areWithinLimits(values)
         calculate values
+        calculateBtn.disabled = true;
 
 # --------------------------------------
-# Function to handle input changes
+# Catch input changes by user in any field
 onInputChange = (event) ->
-    # If any change in fields
     clear_results()
+    calculateBtn.disabled = false;
 
-# Attach event listeners to all input fields in the form
+# Create an event listener for each input field
 inputs = document.querySelectorAll 'form input'
 for input in inputs
     input.addEventListener 'input', onInputChange
@@ -83,8 +84,9 @@ clear_results = (values) ->
     document.getElementById("results").style.color = ''
     document.getElementById('regulator-name').innerHTML = 'Regulator name'
     document.getElementById('theImage').src = 'mc34063/splash.png'
-
-    for key, _ of values
+    
+    # Remove red background color, if any, in all fields
+    for key of values
         field = document.getElementById(key + 'Field')
         field.style.backgroundColor = ''
 
@@ -103,17 +105,7 @@ str_to_float = (values) ->
         res1 : Number(values.res1)
 
 # --------------------------------------
-format_results = (lmin, ct, cout, rsc, r2, rb) ->
-    results =
-        lmin : (lmin * 1e6).toFixed(0)
-        ct   : (ct * 1e12).toFixed(0)
-        cout : (cout * 1e6).toFixed(0)  
-        rsc  : rsc.toFixed(1)
-        r2   : r2.toFixed(1)
-        rb   : rb.toFixed(0)
-
-# --------------------------------------
-validNumbers = (values) ->
+areValidNumbers = (values) ->
     count = 0
 
     for key, value of values
@@ -130,7 +122,7 @@ validNumbers = (values) ->
     return count == 0   # true if all values are valid numbers
 
 # --------------------------------------
-withinLimits = (values) ->
+areWithinLimits = (values) ->
     showLimitsError = (id) ->
         count++
         field = document.getElementById(id)
@@ -159,7 +151,28 @@ withinLimits = (values) ->
         msg += if count == 1 then 'one field' else "#{count} fields"
         showAlert('', 'error', 'center', msg)
         
-    return count == 0   # true if all numbers are in range
+    return count == 0   # true if all numbers are in within their limits
+
+# ---------------------------------------------------------------------
+calculate = (values) ->
+    nums = str_to_float(values)
+
+    if nums.vout < 0
+        inverter nums
+    else if nums.vout < nums.vin
+        step_down nums
+    else
+        step_up nums
+
+# --------------------------------------
+format_results = (lmin, ct, cout, rsc, r2, rb) ->
+    results =
+        lmin : (lmin * 1e6).toFixed(0)
+        ct   : (ct * 1e12).toFixed(0)
+        cout : (cout * 1e6).toFixed(0)  
+        rsc  : rsc.toFixed(1)
+        r2   : r2.toFixed(1)
+        rb   : rb.toFixed(0)
 
 # --------------------------------------
 show_results = (results, name, schematic) ->
@@ -177,17 +190,6 @@ show_results = (results, name, schematic) ->
 
     document.getElementById('regulator-name').innerHTML = name
     document.getElementById('theImage').src = "mc34063/#{schematic}"
-
-# --------------------------------------
-calculate = (values) ->
-    nums = str_to_float(values)
-
-    if nums.vout < 0
-        inverter nums
-    else if nums.vout < nums.vin
-        step_down nums
-    else
-        step_up nums
 
 # --------------------------------------
 step_down = (nums) ->
