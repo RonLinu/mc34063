@@ -62,14 +62,15 @@
   getFieldsValues = function() {
     var values;
     return values = {
-      vin: document.getElementById('vinField').value.trim(),
-      vout: document.getElementById('voutField').value.trim(),
-      iout: document.getElementById('ioutField').value.trim(),
-      freq: document.getElementById('freqField').value.trim(),
-      res1: document.getElementById('res1Field').value.trim()
+      vin: document.getElementById('vinField').value,
+      vout: document.getElementById('voutField').value,
+      iout: document.getElementById('ioutField').value,
+      freq: document.getElementById('freqField').value,
+      res1: document.getElementById('res1Field').value
     };
   };
 
+  
   // --------------------------------------
   calculateBtn = document.getElementById('calculate');
 
@@ -78,7 +79,7 @@
     // Read field values
     values = getFieldsValues();
     
-    // Clear previous results (if any)
+    // Clear previous on-screen results (if any)
     clear_results(values);
     if (areValidNumbers(values) && areWithinLimits(values)) {
       calculate(values);
