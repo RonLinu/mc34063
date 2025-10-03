@@ -4,7 +4,7 @@ RIPPLE = 0.1  # default ripple in volts
 
 window.onload = ->
     document.getElementById('vinField').focus()
-    
+
     # Retrieve saved values from localStorage
     storedData = localStorage.getItem("mc34063")
     if storedData
@@ -29,20 +29,18 @@ showAlert = (title, icon, align, msg) ->
 document.getElementById('save').onclick = ->
     values = getFieldsValues()
 
-    # Clear any red background color in fields
+    # Only clear any red background color in fields
     for key of values
         field = document.getElementById(key + 'Field')
         field.style.backgroundColor = ''
 
     # Accept only valid field values before saving
-    if not areValidNumbers(values) or not areWithinLimits(values)
+    if areValidNumbers(values) and areWithinLimits(values)
+        localStorage.setItem("mc34063", JSON.stringify(values))
+        msg = 'Field values ​​have been saved as new default values'
+        showAlert('', 'info', 'center', msg)
+    else
         clear_results()
-        return
-    
-    # Save
-    localStorage.setItem("mc34063", JSON.stringify(values))
-    msg = 'Field values ​​have been saved as new default values'
-    showAlert('', 'info', 'center', msg)
 
 # --------------------------------------
 getFieldsValues = ->
@@ -52,14 +50,14 @@ getFieldsValues = ->
         iout : document.getElementById('ioutField').value
         freq : document.getElementById('freqField').value
         res1 : document.getElementById('res1Field').value
-    
+
 # --------------------------------------
 calculateBtn = document.getElementById('calculate')
 
 calculateBtn.onclick = ->
     # Read field values
     values = getFieldsValues()
-    
+
     # Clear previous on-screen results (if any)
     clear_results values
 
@@ -84,7 +82,7 @@ clear_results = (values) ->
     document.getElementById("results").style.color = ''
     document.getElementById('regulator-name').innerHTML = 'Regulator name'
     document.getElementById('theImage').src = 'mc34063/splash.png'
-    
+
     # Remove red background color, if any, in all fields
     for key of values
         field = document.getElementById(key + 'Field')
@@ -139,10 +137,10 @@ areWithinLimits = (values) ->
 
     if not (5 <= nums.iout <= 1000)
         showLimitsError 'ioutField'
-        
+
     if not (20 <= nums.freq <= 100)
         showLimitsError 'freqField'
-        
+
     if not (1 <= nums.res1 <= 50)
         showLimitsError 'res1Field'
 
@@ -150,7 +148,7 @@ areWithinLimits = (values) ->
         msg = '<br>Value out of range in '
         msg += if count == 1 then 'one field' else "#{count} fields"
         showAlert('', 'error', 'center', msg)
-        
+
     return count == 0   # true if all numbers are in within their limits
 
 # ---------------------------------------------------------------------
@@ -169,7 +167,7 @@ format_results = (lmin, ct, cout, rsc, r2, rb) ->
     results =
         lmin : (lmin * 1e6).toFixed(0)
         ct   : (ct * 1e12).toFixed(0)
-        cout : (cout * 1e6).toFixed(0)  
+        cout : (cout * 1e6).toFixed(0)
         rsc  : rsc.toFixed(1)
         r2   : r2.toFixed(1)
         rb   : rb.toFixed(0)

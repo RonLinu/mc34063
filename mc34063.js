@@ -7,7 +7,6 @@
   window.onload = function() {
     var key, results1, storedData, value, values;
     document.getElementById('vinField').focus();
-    
     // Retrieve saved values from localStorage
     storedData = localStorage.getItem("mc34063");
     if (storedData) {
@@ -41,21 +40,19 @@
   document.getElementById('save').onclick = function() {
     var field, key, msg, values;
     values = getFieldsValues();
-// Clear any red background color in fields
+// Only clear any red background color in fields
     for (key in values) {
       field = document.getElementById(key + 'Field');
       field.style.backgroundColor = '';
     }
     // Accept only valid field values before saving
-    if (!areValidNumbers(values) || !areWithinLimits(values)) {
-      clear_results();
-      return;
+    if (areValidNumbers(values) && areWithinLimits(values)) {
+      localStorage.setItem("mc34063", JSON.stringify(values));
+      msg = 'Field values ​​have been saved as new default values';
+      return showAlert('', 'info', 'center', msg);
+    } else {
+      return clear_results();
     }
-    
-    // Save
-    localStorage.setItem("mc34063", JSON.stringify(values));
-    msg = 'Field values ​​have been saved as new default values';
-    return showAlert('', 'info', 'center', msg);
   };
 
   // --------------------------------------
@@ -70,7 +67,6 @@
     };
   };
 
-  
   // --------------------------------------
   calculateBtn = document.getElementById('calculate');
 
@@ -78,7 +74,6 @@
     var values;
     // Read field values
     values = getFieldsValues();
-    
     // Clear previous on-screen results (if any)
     clear_results(values);
     if (areValidNumbers(values) && areWithinLimits(values)) {
@@ -109,8 +104,7 @@
     document.getElementById("results").style.color = '';
     document.getElementById('regulator-name').innerHTML = 'Regulator name';
     document.getElementById('theImage').src = 'mc34063/splash.png';
-
-    // Remove red background color, if any, in all fields
+// Remove red background color, if any, in all fields
     results1 = [];
     for (key in values) {
       field = document.getElementById(key + 'Field');
