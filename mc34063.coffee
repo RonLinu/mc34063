@@ -14,19 +14,9 @@ window.onload = ->
             document.getElementById( key + "Field").value = value
 
 # --------------------------------------
-showAlert = (title, icon, align, msg) ->
-    new Promise (resolve) ->
-        Swal.fire
-            title: title
-            html: "<div style='text-align: #{align}; font-size: 16px;'>#{msg}</div>"
-            icon: icon
-            confirmButtonText: 'OK'
-            position: align
-            animation: true
-            willClose: resolve
+saveBtn = document.getElementById('save')
 
-# --------------------------------------
-document.getElementById('save').onclick = ->
+saveBtn.onclick = ->
     values = getFieldsValues()
 
     # Only clear any red background color in fields
@@ -41,15 +31,6 @@ document.getElementById('save').onclick = ->
         showAlert('', 'info', 'center', msg)
     else
         clear_results()
-
-# --------------------------------------
-getFieldsValues = ->
-    values =
-        vin  : document.getElementById('vinField').value
-        vout : document.getElementById('voutField').value
-        iout : document.getElementById('ioutField').value
-        freq : document.getElementById('freqField').value
-        res1 : document.getElementById('res1Field').value
 
 # --------------------------------------
 calculateBtn = document.getElementById('calculate')
@@ -76,6 +57,29 @@ inputs = document.querySelectorAll 'form input'
 for input in inputs
     input.addEventListener 'input', onInputChange
 
+# ---------------------------------------------------------------------
+showAlert = (title, icon, align, msg) ->
+    new Promise (resolve) ->
+        Swal.fire
+            title: title
+            html: "<div style='text-align: #{align}; font-size: 16px;'>#{msg}</div>"
+            icon: icon
+            confirmButtonText: 'OK'
+            position: align
+            animation: true
+            willClose: resolve
+
+# --------------------------------------
+getFieldsValues = ->
+    values =
+        vin  : document.getElementById('vinField').value
+        vout : document.getElementById('voutField').value
+        iout : document.getElementById('ioutField').value
+        freq : document.getElementById('freqField').value
+        res1 : document.getElementById('res1Field').value
+
+    return values
+    
 # --------------------------------------
 clear_results = (values) ->
     document.getElementById('results').innerHTML = ''
@@ -91,7 +95,7 @@ clear_results = (values) ->
 # --------------------------------------
 isValidFloat = (str) ->
     regex = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/
-    regex.test(str.trim())
+    return regex.test(str.trim())
 
 # --------------------------------------
 str_to_float = (values) ->
@@ -101,7 +105,9 @@ str_to_float = (values) ->
         iout : Number(values.iout)
         freq : Number(values.freq)
         res1 : Number(values.res1)
-
+        
+    return nums
+    
 # --------------------------------------
 areValidNumbers = (values) ->
     count = 0
@@ -172,6 +178,8 @@ format_results = (lmin, ct, cout, rsc, r2, rb) ->
         r2   : r2.toFixed(1)
         rb   : rb.toFixed(0)
 
+    return results
+    
 # --------------------------------------
 show_results = (results, name, schematic) ->
     footer = document.getElementById('results')

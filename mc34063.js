@@ -1,6 +1,6 @@
 (function() {
   // https://ronlinu.github.io/ms34063
-  var RIPPLE, areValidNumbers, areWithinLimits, calculate, calculateBtn, clear_results, format_results, getFieldsValues, i, input, inputs, inverter, isValidFloat, len, onInputChange, showAlert, show_results, step_down, step_up, str_to_float;
+  var RIPPLE, areValidNumbers, areWithinLimits, calculate, calculateBtn, clear_results, format_results, getFieldsValues, i, input, inputs, inverter, isValidFloat, len, onInputChange, saveBtn, showAlert, show_results, step_down, step_up, str_to_float;
 
   RIPPLE = 0.1; // default ripple in volts
 
@@ -22,22 +22,9 @@
   };
 
   // --------------------------------------
-  showAlert = function(title, icon, align, msg) {
-    return new Promise(function(resolve) {
-      return Swal.fire({
-        title: title,
-        html: `<div style='text-align: ${align}; font-size: 16px;'>${msg}</div>`,
-        icon: icon,
-        confirmButtonText: 'OK',
-        position: align,
-        animation: true,
-        willClose: resolve
-      });
-    });
-  };
+  saveBtn = document.getElementById('save');
 
-  // --------------------------------------
-  document.getElementById('save').onclick = function() {
+  saveBtn.onclick = function() {
     var field, key, msg, values;
     values = getFieldsValues();
 // Only clear any red background color in fields
@@ -53,18 +40,6 @@
     } else {
       return clear_results();
     }
-  };
-
-  // --------------------------------------
-  getFieldsValues = function() {
-    var values;
-    return values = {
-      vin: document.getElementById('vinField').value,
-      vout: document.getElementById('voutField').value,
-      iout: document.getElementById('ioutField').value,
-      freq: document.getElementById('freqField').value,
-      res1: document.getElementById('res1Field').value
-    };
   };
 
   // --------------------------------------
@@ -98,6 +73,35 @@
   }
 
   // --------------------------------------
+  showAlert = function(title, icon, align, msg) {
+    return new Promise(function(resolve) {
+      return Swal.fire({
+        title: title,
+        html: `<div style='text-align: ${align}; font-size: 16px;'>${msg}</div>`,
+        icon: icon,
+        confirmButtonText: 'OK',
+        position: align,
+        animation: true,
+        willClose: resolve
+      });
+    });
+  };
+
+  // --------------------------------------
+  getFieldsValues = function() {
+    var values;
+    values = {
+      vin: document.getElementById('vinField').value,
+      vout: document.getElementById('voutField').value,
+      iout: document.getElementById('ioutField').value,
+      freq: document.getElementById('freqField').value,
+      res1: document.getElementById('res1Field').value
+    };
+    return values;
+  };
+
+  
+  // --------------------------------------
   clear_results = function(values) {
     var field, key, results1;
     document.getElementById('results').innerHTML = '';
@@ -123,15 +127,17 @@
   // --------------------------------------
   str_to_float = function(values) {
     var nums;
-    return nums = {
+    nums = {
       vin: Number(values.vin),
       vout: Number(values.vout),
       iout: Number(values.iout),
       freq: Number(values.freq),
       res1: Number(values.res1)
     };
+    return nums;
   };
 
+  
   // --------------------------------------
   areValidNumbers = function(values) {
     var count, field, key, msg, value;
@@ -204,7 +210,7 @@
   // --------------------------------------
   format_results = function(lmin, ct, cout, rsc, r2, rb) {
     var results;
-    return results = {
+    results = {
       lmin: (lmin * 1e6).toFixed(0),
       ct: (ct * 1e12).toFixed(0),
       cout: (cout * 1e6).toFixed(0),
@@ -212,8 +218,10 @@
       r2: r2.toFixed(1),
       rb: rb.toFixed(0)
     };
+    return results;
   };
 
+  
   // --------------------------------------
   show_results = function(results, name, schematic) {
     var footer, resultStr;
