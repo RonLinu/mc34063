@@ -47,25 +47,26 @@ calculateBtn.onclick = ->
         calculateBtn.disabled = true;
 
 # --------------------------------------
-# Catch input changes by user in any field
-onInputChange = (event) ->
-    clear_results()
-    calculateBtn.disabled = false;
+do ->
+    # Catch input changes by user in any field
+    onInputChange = (event) ->
+        clear_results()
+        calculateBtn.disabled = false;
 
-# Create an event listener for each input field
-inputs = document.querySelectorAll 'form input'
-for input in inputs
-    input.addEventListener 'input', onInputChange
+    # Create an event listener for each input field
+    inputs = document.querySelectorAll 'form input'
+    for input in inputs
+        input.addEventListener 'input', onInputChange
 
 # ---------------------------------------------------------------------
-showAlert = (title, icon, align, msg) ->
+showAlert = (title, icon, textalign, msg) ->
     new Promise (resolve) ->
         Swal.fire
             title: title
-            html: "<div style='text-align: #{align}; font-size: 16px;'>#{msg}</div>"
+            html: "<div style='text-align: #{textalign}; font-size: 16px;'>#{msg}</div>"
             icon: icon
             confirmButtonText: 'OK'
-            position: align
+            position: 'center'
             animation: true
             willClose: resolve
 
@@ -236,15 +237,15 @@ step_up = (nums) ->
 
 # --------------------------------------
 inverter = (nums) ->
-    ratio   = (Math.abs(nums.vout) + 0.8) / (nums.vin - 0.8 - nums.vout)
+    ratio   = (Math.abs(nums.vout) + 0.8) / (nums.vin - 0.8)
     tontoff = 1.0 / (nums.freq * 1e3)
     toff    = tontoff / (ratio + 1)
-    ton_max = tontoff - toff
-    ipeak   = nums.iout / 1e3 * 2.0
+    ton     = tontoff - toff
+    ipeak   = 2 * nums.iout / 1e3 # 2 * nums.iout * (ratio + 1) 
 
-    lmin  = (nums.vin - 0.8) / ipeak * ton_max
-    ct    = ton_max * 4e-5
-    cout  = (nums.iout / 1e3 * ton_max) / RIPPLE
+    lmin  = (nums.vin - 0.8) / ipeak * ton
+    ct    = ton * 4e-5
+    cout  = (nums.iout / 1e3 * ton) / RIPPLE
     rsc   = 0.33 / ipeak
     r2    = ( (Math.abs(nums.vout) - 1.25) / 1.25) * nums.res1
     rb    = 0
