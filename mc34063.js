@@ -231,13 +231,13 @@
     footer = document.getElementById('results');
     resultStr = '<pre>';
     resultStr += `<u>${name}</u>\n`;
-    resultStr += `Lmin = ${results.lmin} uH\n`;
-    resultStr += `Ct   = ${results.ct} pF\n`;
-    resultStr += `Co   = ${results.cout} uF\n`;
-    resultStr += `Rsc  = ${results.rsc} Ω\n`;
-    resultStr += `R2   = ${results.r2} KΩ\n`;
+    resultStr += `L   = ${results.lmin} uH (min)\n`;
+    resultStr += `Ct  = ${results.ct} pF\n`;
+    resultStr += `Co  = ${results.cout} uF (min)\n`;
+    resultStr += `Rsc = ${results.rsc} Ω\n`;
+    resultStr += `R2  = ${results.r2} KΩ\n`;
     if (results.rb !== "0") {
-      resultStr += `Rb   = ${results.rb} Ω\n`;
+      resultStr += `Rb  = ${results.rb} Ω\n`;
     }
     resultStr += '</pre>';
     footer.innerHTML = resultStr;
