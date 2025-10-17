@@ -3,46 +3,34 @@
 RIPPLE = 0.1  # default ripple in volts
 
 window.onload = ->
-    document.getElementById('vinField').focus()
+    document.getElementById('vin').focus()
 
-    # Retrieve saved values from localStorage
+    # Retrieve fields values from localStorage
     storedData = localStorage.getItem("mc34063")
     if storedData
-        # Restore values in all fields
         values = JSON.parse(storedData)
         for key, value of values
-            document.getElementById( key + "Field").value = value
+            document.getElementById(key).value = value
 
 # --------------------------------------
 saveBtn = document.getElementById('save')
 
 saveBtn.onclick = ->
+    # Save fields values to localStorage
     values = getFieldsValues()
-
-    # Only clear any red background color in fields
-    for key of values
-        field = document.getElementById(key + 'Field')
-        field.style.backgroundColor = ''
-
-    # Accept only valid field values before saving
-    if areValidNumbers(values) and areWithinLimits(values)
-        localStorage.setItem("mc34063", JSON.stringify(values))
-        msg = 'Field values ​​have been saved as new default values'
-        showAlert('', 'info', 'center', msg)
-    else
-        clear_results()
+    localStorage.setItem("mc34063", JSON.stringify(values))
+    showAlert('', 'info', 'center', 'Field values ​​have been saved!')
 
 # --------------------------------------
 calculateBtn = document.getElementById('calculate')
 
 calculateBtn.onclick = ->
-    # Read field values
     values = getFieldsValues()
 
     # Clear previous on-screen results (if any)
     clear_results values
 
-    if areValidNumbers(values) and areWithinLimits(values)
+    if validNumbers(values) and withinLimits(values)
         calculate values
         calculateBtn.disabled = true;
 
@@ -60,37 +48,33 @@ do ->
 
 # ---------------------------------------------------------------------
 showAlert = (title, icon, textalign, msg) ->
-    new Promise (resolve) ->
-        Swal.fire
-            title: title
-            html: "<div style='text-align: #{textalign}; font-size: 16px;'>#{msg}</div>"
-            icon: icon
-            confirmButtonText: 'OK'
-            position: 'center'
-            animation: true
-            willClose: resolve
+    Swal.fire
+        title: title
+        html: "<div style='text-align: #{textalign}; font-size: 16px;'>#{msg}</div>"
+        icon: icon
+        confirmButtonText: 'OK'
+        position: 'center'
+        animation: true
 
 # --------------------------------------
 getFieldsValues = ->
     values =
-        vin  : document.getElementById('vinField').value
-        vout : document.getElementById('voutField').value
-        iout : document.getElementById('ioutField').value
-        freq : document.getElementById('freqField').value
-        res1 : document.getElementById('res1Field').value
-
-    return values
+        vin  : document.getElementById('vin').value
+        vout : document.getElementById('vout').value
+        iout : document.getElementById('iout').value
+        freq : document.getElementById('freq').value
+        res1 : document.getElementById('res1').value
     
 # --------------------------------------
 clear_results = (values) ->
     document.getElementById('results').innerHTML = ''
     document.getElementById("results").style.color = ''
     document.getElementById('regulator-name').innerHTML = 'Regulator name'
-    document.getElementById('theImage').src = 'mc34063/splash.png'
+    document.getElementById('schematic').src = 'mc34063/splash.png'
 
     # Remove red background color, if any, in all fields
     for key of values
-        field = document.getElementById(key + 'Field')
+        field = document.getElementById(key)
         field.style.backgroundColor = ''
 
 # --------------------------------------
@@ -106,17 +90,15 @@ str_to_float = (values) ->
         iout : Number(values.iout)
         freq : Number(values.freq)
         res1 : Number(values.res1)
-        
-    return nums
     
 # --------------------------------------
-areValidNumbers = (values) ->
+validNumbers = (values) ->
     count = 0
 
     for key, value of values
         if not isValidFloat(value)
             count++
-            field = document.getElementById(key + 'Field')
+            field = document.getElementById(key)
             field.style.backgroundColor = 'LightPink';
 
     if count
@@ -127,29 +109,29 @@ areValidNumbers = (values) ->
     return count == 0   # true if all values are valid numbers
 
 # --------------------------------------
-areWithinLimits = (values) ->
+withinLimits = (values) ->
     showLimitsError = (id) ->
         count++
         field = document.getElementById(id)
-        field.style.backgroundColor = 'LightPink';
+        field.style.backgroundColor = "LightPink"
 
     count = 0
     nums = str_to_float(values)
 
     if not (5 <= nums.vin <= 40)
-        showLimitsError 'vinField'
+        showLimitsError 'vin'
 
     if not ((-40 <= nums.vout <= -3) or (3 <= nums.vout <= 40))
-         showLimitsError 'voutField'
+         showLimitsError 'vout'
 
     if not (5 <= nums.iout <= 1000)
-        showLimitsError 'ioutField'
+        showLimitsError 'iout'
 
     if not (20 <= nums.freq <= 100)
-        showLimitsError 'freqField'
+        showLimitsError 'freq'
 
     if not (1 <= nums.res1 <= 50)
-        showLimitsError 'res1Field'
+        showLimitsError 'res1'
 
     if count
         msg = '<br>Value out of range in '
@@ -178,8 +160,6 @@ format_results = (lmin, ct, cout, rsc, r2, rb) ->
         rsc  : rsc.toFixed(1)
         r2   : r2.toFixed(1)
         rb   : rb.toFixed(0)
-
-    return results
     
 # --------------------------------------
 show_results = (results, name, schematic) ->
@@ -196,7 +176,7 @@ show_results = (results, name, schematic) ->
     footer.innerHTML = resultStr
 
     document.getElementById('regulator-name').innerHTML = name
-    document.getElementById('theImage').src = "mc34063/#{schematic}"
+    document.getElementById('schematic').src = "mc34063/#{schematic}"
 
 # --------------------------------------
 step_down = (nums) ->
