@@ -30,9 +30,19 @@ calculateBtn.onclick = ->
     # Clear previous on-screen results (if any)
     clear_results values
 
-    if validNumbers(values) and withinLimits(values)
+    if withinLimits(values)
         calculate values
         calculateBtn.disabled = true;
+
+# ---------------------------------------------------------------------
+showAlert = (title, icon, textalign, msg) ->
+    Swal.fire
+        title: title
+        html: "<div style='text-align: #{textalign}; font-size: 16px;'>#{msg}</div>"
+        icon: icon
+        confirmButtonText: 'OK'
+        position: 'center'
+        animation: true
 
 # --------------------------------------
 do ->
@@ -46,15 +56,17 @@ do ->
     for input in inputs
         input.addEventListener 'input', onInputChange
 
-# ---------------------------------------------------------------------
-showAlert = (title, icon, textalign, msg) ->
-    Swal.fire
-        title: title
-        html: "<div style='text-align: #{textalign}; font-size: 16px;'>#{msg}</div>"
-        icon: icon
-        confirmButtonText: 'OK'
-        position: 'center'
-        animation: true
+    title = "MC34063 calculator \u00A9"
+    msg = '''This application calculates the value of all the components required
+	to build a switching regulator based on the MC34063 chip.
+    <br><br>
+	The following configurations are supported:<br>
+	- Step Down (buck)<br>
+	- Step Up (boost)<br>
+	- Inverter<br>
+    '''
+    
+    showAlert(title, '', 'left', msg)
 
 # --------------------------------------
 getFieldsValues = ->
@@ -91,23 +103,6 @@ str_to_float = (values) ->
         freq : Number(values.freq)
         res1 : Number(values.res1)
     
-# --------------------------------------
-validNumbers = (values) ->
-    count = 0
-
-    for key, value of values
-        if not isValidFloat(value)
-            count++
-            field = document.getElementById(key)
-            field.style.backgroundColor = 'LightPink';
-
-    if count
-        msg = '<br>Invalid number in '
-        msg += if count == 1 then 'one field' else "#{count} fields"
-        showAlert('', 'error', 'center', msg)
-
-    return count == 0   # true if all values are valid numbers
-
 # --------------------------------------
 withinLimits = (values) ->
     showLimitsError = (id) ->
