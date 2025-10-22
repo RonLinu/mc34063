@@ -6,7 +6,6 @@ RIPPLE = 0.1; // default ripple in volts
 
 window.onload = function() {
   var key, results1, storedData, value, values;
-  document.getElementById('vin').focus();
   // Retrieve fields values from localStorage
   storedData = localStorage.getItem("mc34063");
   if (storedData) {
@@ -53,13 +52,14 @@ showAlert = function(title, icon, textalign, msg) {
     icon: icon,
     confirmButtonText: 'OK',
     position: 'center',
+    focusConfirm: true,
     animation: true
   });
 };
 
-(function() {  // --------------------------------------
+(async function() {  // --------------------------------------
   var i, input, inputs, len, msg, onInputChange, title;
-  // Catch input changes by user in any field
+  // Event listener to catch input change by user in a field
   onInputChange = function(event) {
     clear_results();
     return calculateBtn.disabled = false;
@@ -70,26 +70,32 @@ showAlert = function(title, icon, textalign, msg) {
     input = inputs[i];
     input.addEventListener('input', onInputChange);
   }
-  title = "MC34063 calculator \u00A9";
-  msg = `This application calculates the value of all the components required
+  title = "MC34063 calculator";
+  msg = `<center>\u00A9 2025 - RonLinu</center><br>
+This application calculates the value of all the components required
 to build a switching regulator based on the MC34063 chip.
-    <br><br>
+<br><br>
 The following configurations are supported:<br>
 - Step Down (buck)<br>
 - Step Up (boost)<br>
-- Inverter<br>`;
-  return showAlert(title, '', 'left', msg);
+- Inverter`;
+  await showAlert(title, '', 'left', msg);
+  return document.getElementById('vin').focus();
 })();
+
 
 // --------------------------------------
 getFieldsValues = function() {
-  var values;
+  var getVal, values;
+  getVal = function(id) {
+    return document.getElementById(id).value;
+  };
   return values = {
-    vin: document.getElementById('vin').value,
-    vout: document.getElementById('vout').value,
-    iout: document.getElementById('iout').value,
-    freq: document.getElementById('freq').value,
-    res1: document.getElementById('res1').value
+    vin: getVal('vin'),
+    vout: getVal('vout'),
+    iout: getVal('iout'),
+    freq: getVal('freq'),
+    res1: getVal('res1')
   };
 };
 
@@ -98,7 +104,6 @@ getFieldsValues = function() {
 clear_results = function(values) {
   var field, key, results1;
   document.getElementById('results').innerHTML = '';
-  document.getElementById("results").style.color = '';
   document.getElementById('regulator-name').innerHTML = 'Regulator name';
   document.getElementById('schematic').src = 'mc34063/splash.png';
 // Remove red background color, if any, in all fields

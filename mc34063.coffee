@@ -3,8 +3,6 @@
 RIPPLE = 0.1  # default ripple in volts
 
 window.onload = ->
-    document.getElementById('vin').focus()
-
     # Retrieve fields values from localStorage
     storedData = localStorage.getItem("mc34063")
     if storedData
@@ -32,7 +30,7 @@ calculateBtn.onclick = ->
 
     if withinLimits(values)
         calculate values
-        calculateBtn.disabled = true;
+        calculateBtn.disabled = true
 
 # ---------------------------------------------------------------------
 showAlert = (title, icon, textalign, msg) ->
@@ -42,45 +40,50 @@ showAlert = (title, icon, textalign, msg) ->
         icon: icon
         confirmButtonText: 'OK'
         position: 'center'
+        focusConfirm: true
         animation: true
 
 # --------------------------------------
 do ->
-    # Catch input changes by user in any field
+    # Event listener to catch input change by user in a field
     onInputChange = (event) ->
         clear_results()
-        calculateBtn.disabled = false;
+        calculateBtn.disabled = false
 
     # Create an event listener for each input field
     inputs = document.querySelectorAll 'form input'
     for input in inputs
         input.addEventListener 'input', onInputChange
 
-    title = "MC34063 calculator \u00A9"
-    msg = '''This application calculates the value of all the components required
-	to build a switching regulator based on the MC34063 chip.
-    <br><br>
-	The following configurations are supported:<br>
-	- Step Down (buck)<br>
-	- Step Up (boost)<br>
-	- Inverter<br>
+    title = "MC34063 calculator"
+    msg = '''<center>\u00A9 2025 - RonLinu</center><br>
+        This application calculates the value of all the components required
+        to build a switching regulator based on the MC34063 chip.
+        <br><br>
+        The following configurations are supported:<br>
+        - Step Down (buck)<br>
+        - Step Up (boost)<br>
+        - Inverter
     '''
-    
-    showAlert(title, '', 'left', msg)
+
+    await showAlert(title, '', 'left', msg)
+    document.getElementById('vin').focus()
 
 # --------------------------------------
 getFieldsValues = ->
+    getVal = (id) ->
+        document.getElementById(id).value
+
     values =
-        vin  : document.getElementById('vin').value
-        vout : document.getElementById('vout').value
-        iout : document.getElementById('iout').value
-        freq : document.getElementById('freq').value
-        res1 : document.getElementById('res1').value
-    
+        vin  : getVal('vin')
+        vout : getVal('vout')
+        iout : getVal('iout')
+        freq : getVal('freq')
+        res1 : getVal('res1')
+
 # --------------------------------------
 clear_results = (values) ->
     document.getElementById('results').innerHTML = ''
-    document.getElementById("results").style.color = ''
     document.getElementById('regulator-name').innerHTML = 'Regulator name'
     document.getElementById('schematic').src = 'mc34063/splash.png'
 
@@ -102,7 +105,7 @@ str_to_float = (values) ->
         iout : Number(values.iout)
         freq : Number(values.freq)
         res1 : Number(values.res1)
-    
+
 # --------------------------------------
 withinLimits = (values) ->
     showLimitsError = (id) ->
@@ -155,7 +158,7 @@ format_results = (lmin, ct, cout, rsc, r2, rb) ->
         rsc  : rsc.toFixed(1)
         r2   : r2.toFixed(1)
         rb   : rb.toFixed(0)
-    
+
 # --------------------------------------
 show_results = (results, name, schematic) ->
     footer = document.getElementById('results')
@@ -216,7 +219,7 @@ inverter = (nums) ->
     tontoff = 1.0 / (nums.freq * 1e3)
     toff    = tontoff / (ratio + 1)
     ton     = tontoff - toff
-    ipeak   = 2 * nums.iout / 1e3 # 2 * nums.iout * (ratio + 1) 
+    ipeak   = 2 * nums.iout / 1e3 # 2 * nums.iout * (ratio + 1)
 
     lmin  = (nums.vin - 0.8) / ipeak * ton
     ct    = ton * 4e-5
