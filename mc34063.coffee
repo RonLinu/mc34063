@@ -42,6 +42,7 @@ showAlert = (title, icon, textalign, msg) ->
         position: 'center'
         focusConfirm: true
         animation: true
+        allowOutsideClick: false
 
 # --------------------------------------
 do ->

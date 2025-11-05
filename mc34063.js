@@ -53,7 +53,8 @@ showAlert = function(title, icon, textalign, msg) {
     confirmButtonText: 'OK',
     position: 'center',
     focusConfirm: true,
-    animation: true
+    animation: true,
+    allowOutsideClick: false
   });
 };
 
@@ -83,7 +84,6 @@ The following configurations are supported:<br>
   return document.getElementById('vin').focus();
 })();
 
-
 // --------------------------------------
 getFieldsValues = function() {
   var getVal, values;
@@ -98,7 +98,6 @@ getFieldsValues = function() {
     res1: getVal('res1')
   };
 };
-
 
 // --------------------------------------
 clear_results = function(values) {
@@ -133,7 +132,6 @@ str_to_float = function(values) {
     res1: Number(values.res1)
   };
 };
-
 
 // --------------------------------------
 withinLimits = function(values) {
@@ -195,7 +193,6 @@ format_results = function(lmin, ct, cout, rsc, r2, rb) {
     rb: rb.toFixed(0)
   };
 };
-
 
 // --------------------------------------
 show_results = function(results, name, schematic) {
@@ -261,7 +258,7 @@ inverter = function(nums) {
   tontoff = 1.0 / (nums.freq * 1e3);
   toff = tontoff / (ratio + 1);
   ton = tontoff - toff;
-  ipeak = 2 * nums.iout / 1e3; // 2 * nums.iout * (ratio + 1) 
+  ipeak = 2 * nums.iout / 1e3; // 2 * nums.iout * (ratio + 1)
   lmin = (nums.vin - 0.8) / ipeak * ton;
   ct = ton * 4e-5;
   cout = (nums.iout / 1e3 * ton) / RIPPLE;
