@@ -220,7 +220,7 @@ inverter = (nums) ->
     tontoff = 1.0 / (nums.freq * 1e3)
     toff    = tontoff / (ratio + 1)
     ton     = tontoff - toff
-    ipeak   = 2 * nums.iout / 1e3 # 2 * nums.iout * (ratio + 1)
+    ipeak   = (2 * nums.iout / 1e3) * (ratio + 1)
 
     lmin  = (nums.vin - 0.8) / ipeak * ton
     ct    = ton * 4e-5
