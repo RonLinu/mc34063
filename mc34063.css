@@ -1,5 +1,5 @@
 body {
-  font-weight: bold;
+  font-weight: normal;
 }
 
 .split {
@@ -42,7 +42,6 @@ body {
   background-color: LightCyan;
   color: black;
 }
-
 
 .split.left {
   display: flex;
@@ -127,7 +126,9 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-.swal2-popup {
-  border-radius: 20px;        /* rounded corners */
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.2);
+/*
+  backdrop-filter: blur(0.5px);
+*/
 }
-
