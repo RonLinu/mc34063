@@ -31,8 +31,10 @@ typedef Results = ({
     double cout,
     double rsc,
     double r2,
-    double rb
-});  
+    double rb,
+    String name,
+    String schematic
+});
 
 // -----------------------------------------------------------------------------
 void main() {
@@ -48,7 +50,18 @@ void main() {
 
   calculateBtn!.onClick.listen((_) {
     // Clear page to defaults
-    updateWebPage('', 'Regulator name', 'splash.png');
+    Results results = (
+      lmin: 0.0,
+      ct: 0.0,
+      cout: 0.0,
+      rsc: 0.0,
+      r2: 0.0,
+      rb: 0.0,
+      name: 'Regulator name',
+      schematic: 'splash.png',
+    );
+
+    updatePage(results);
 
     // Read fields, convert to floats, check limits
     final values = readValues();
@@ -64,11 +77,13 @@ void main() {
 
     // Dispatch to appropriate regulator circuit
     if (nums.vout < 0)
-      inverter(nums);
+      results = inverter(nums);
     else if (nums.vout < nums.vin)
-      stepDown(nums);
+      results = stepDown(nums);
     else
-      stepUp(nums);
+      results = stepUp(nums);
+
+    updatePage(results);
   });
 }
 
@@ -86,7 +101,7 @@ void saveFields() {
 
   final jsonString = jsonEncode(values);
   window.localStorage.setItem('mc34063', jsonString);
-  
+
   showDialog('Fields have been saved!');
 }
 
@@ -149,7 +164,7 @@ String validateLimits(Numbers nums) {
 }
 
 // -------------------------------------
-void stepDown(Numbers nums) {
+Results stepDown(Numbers nums) {
   final ratio = (nums.vout + 0.8) / (nums.vin - 0.8 - nums.vout);
   final tontoff = 1.0 / (nums.freq * 1e3);
   final toff = tontoff / (ratio + 1);
@@ -163,14 +178,16 @@ void stepDown(Numbers nums) {
     rsc: 0.33 / ipeak,
     r2: (nums.vout - 1.25) / 1.25 * nums.res1,
     rb: 0.0,
+    name: 'Step-down regulator',
+    schematic: 'step_down.png'
+
   );
 
-  final resultStr = formatResults(results);
-  updateWebPage(resultStr, 'Step-Down regulator', 'step_down.png');
+  return results;
 }
 
 // -------------------------------------
-void stepUp(Numbers nums) {
+Results stepUp(Numbers nums) {
   final ratio = (nums.vout + 0.8 - nums.vin) / (nums.vin - 1);
   final tontoff = 1.0 / (nums.freq * 1e3);
   final toff = tontoff / (ratio + 1);
@@ -186,14 +203,15 @@ void stepUp(Numbers nums) {
     rsc: rsc,
     r2: ((nums.vout - 1.25) / 1.25) * nums.res1,
     rb: ((nums.vin - 1) - ipeak) * rsc / ib,
+    name: 'Step-up regulator',
+    schematic: 'step_up.png'
   );
 
-  final resultStr = formatResults(results);
-  updateWebPage(resultStr, 'Step-Up regulator', 'step_up.png');
+  return results;
 }
 
 // -------------------------------------
-void inverter(Numbers nums) {
+Results inverter(Numbers nums) {
   final ratio = ((nums.vout).abs() + 0.8) / (nums.vin - 0.8);
   final tontoff = 1.0 / (nums.freq * 1e3);
   final toff = tontoff / (ratio + 1);
@@ -207,10 +225,11 @@ void inverter(Numbers nums) {
     rsc: 0.33 / ipeak,
     r2: (((nums.vout).abs() - 1.25) / 1.25) * nums.res1,
     rb: 0.0,
+    name: 'Inverter regulator',
+    schematic: 'inverter.png'
   );
 
-  final resultStr = formatResults(results);
-  updateWebPage(resultStr, 'Inverter regulator', 'inverter.png');
+  return results;
 }
 
 // -------------------------------------
@@ -231,12 +250,15 @@ String formatResults(Results results) {
 }
 
 // -------------------------------------
-void updateWebPage(String results, String name, String schematic) {
-  document.getElementById('results')!.innerHTML = results.toJS;
-  document.getElementById('regulator-name')!.innerHTML = '<b>$name</b>'.toJS;
+void updatePage(Results results) {
+  var resultFmt = '';
+  if (results.lmin != 0.0) resultFmt = formatResults(results);
+
+  document.getElementById('results')!.innerHTML = resultFmt.toJS;
+  document.getElementById('regulator-name')!.innerHTML = '<b>${results.name}</b>'.toJS;
 
   final image = document.getElementById('schematic') as HTMLImageElement;
-  image.src = 'resources/$schematic';
+  image.src = 'resources/${results.schematic}';
 }
 
 // -------------------------------------
