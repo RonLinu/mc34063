@@ -1,6 +1,6 @@
-import 'package:web/web.dart';    // to install: dart pub add web
-import 'dart:js_interop';         // for .toJS()
-import 'dart:convert';            // for json conversions
+import 'package:web/web.dart'; // to install: dart pub add web
+import 'dart:js_interop'; // for .toJS()
+import 'dart:convert'; // for json conversions
 
 import 'dialogs.dart';
 
@@ -26,31 +26,31 @@ typedef Numbers = ({
 
 // Results from calculations
 typedef Results = ({
-    double lmin,
-    double ct,
-    double cout,
-    double rsc,
-    double r2,
-    double rb,
-    String name,
-    String schematic
+  double lmin,
+  double ct,
+  double cout,
+  double rsc,
+  double r2,
+  double rb,
+  String name,
+  String schematic
 });
 
 // -----------------------------------------------------------------------------
 void main() {
-  final saveBtn = document.getElementById('save');
-  final calculateBtn = document.getElementById('calculate');
+  var saveBtn = document.getElementById('save');
+  var calculateBtn = document.getElementById('calculate');
 
-  restoreFields();
+  restoreHtmlFields();
   greetings();
 
   saveBtn!.onClick.listen((_) {
-    saveFields();
+    saveHtmlFields();
   });
 
   calculateBtn!.onClick.listen((_) {
     // Clear page to defaults
-    Results results = (
+    var results = (
       lmin: 0.0,
       ct: 0.0,
       cout: 0.0,
@@ -64,13 +64,13 @@ void main() {
     updatePage(results);
 
     // Read fields, convert to floats, check limits
-    final values = readValues();
-    final nums = convertToFloats(values);
-    final errors = validateLimits(nums);
+    var htmlFields = readHtmlFields();
+    var nums = convertToFloats(htmlFields);
+    var errors = validateLimits(nums);
 
     if (errors.isNotEmpty) {
-      final occurences = errors.split('-').length - 1;
-      final plural = (occurences > 1) ? 'these fields' : 'this field';
+      var occurences = errors.split('-').length - 1;
+      var plural = (occurences > 1) ? 'these fields' : 'this field';
       showDialog('Value is out of range in $plural <hr> $errors');
       return;
     }
@@ -88,10 +88,10 @@ void main() {
 }
 
 // -------------------------------------
-void saveFields() {
-  final fields = readValues();
+void saveHtmlFields() {
+  var fields = readHtmlFields();
 
-  final values = {
+  var values = {
     'vin': fields.vin,
     'vout': fields.vout,
     'iout': fields.iout,
@@ -99,51 +99,47 @@ void saveFields() {
     'res1': fields.res1,
   };
 
-  final jsonString = jsonEncode(values);
+  var jsonString = jsonEncode(values);
   window.localStorage.setItem('mc34063', jsonString);
 
   showDialog('Fields have been saved!');
 }
 
 // -------------------------------------
-void restoreFields() {
-  final jsonString = window.localStorage.getItem('mc34063');
+void restoreHtmlFields() {
+  var jsonString = window.localStorage.getItem('mc34063');
   if (jsonString == null) return;
 
-  final fields = jsonDecode(jsonString);
+  var fields = jsonDecode(jsonString);
 
   // Update fields on screen
-  for (final field in fields.entries) {
-    final f = document.getElementById(field.key) as HTMLInputElement;
+  for (var field in fields.entries) {
+    var f = document.getElementById(field.key) as HTMLInputElement;
     f.value = field.value;
   }
 }
 
 // -------------------------------------
-Fields readValues() {
-  final inputs = (
+Fields readHtmlFields() {
+  return (
     vin: (document.getElementById('vin') as HTMLInputElement).value,
     vout: (document.getElementById('vout') as HTMLInputElement).value,
     iout: (document.getElementById('iout') as HTMLInputElement).value,
     freq: (document.getElementById('freq') as HTMLInputElement).value,
     res1: (document.getElementById('res1') as HTMLInputElement).value
   );
-
-  return inputs;
 }
 
 // -------------------------------------
 Numbers convertToFloats(Fields fields) {
   // Fields are expected to contain valid float numbers with html screening
-  final nums = (
+  return (
     vin: double.parse(fields.vin),
     vout: double.parse(fields.vout),
     iout: double.parse(fields.iout),
     freq: double.parse(fields.freq),
     res1: double.parse(fields.res1)
   );
-
-  return nums;
 }
 
 // -------------------------------------
@@ -151,8 +147,10 @@ String validateLimits(Numbers nums) {
   var errors = '';
 
   if (nums.vin < 3.0 || nums.vin > 40) errors += '- Input voltage<br>';
+
   if ((nums.vout > -3 && nums.vout < 3) || nums.vout < -40 || nums.vout > 40)
     errors += '- Output voltage<br>';
+
   if ((nums.vin - nums.vout).abs() < 3)
     errors += '- Input/Output voltage differential<br>';
 
@@ -165,13 +163,13 @@ String validateLimits(Numbers nums) {
 
 // -------------------------------------
 Results stepDown(Numbers nums) {
-  final ratio = (nums.vout + 0.8) / (nums.vin - 0.8 - nums.vout);
-  final tontoff = 1.0 / (nums.freq * 1e3);
-  final toff = tontoff / (ratio + 1);
-  final ton_max = tontoff - toff;
-  final ipeak = nums.iout / 1e3 * 2.0;
+  var ratio = (nums.vout + 0.8) / (nums.vin - 0.8 - nums.vout);
+  var tontoff = 1.0 / (nums.freq * 1e3);
+  var toff = tontoff / (ratio + 1);
+  var ton_max = tontoff - toff;
+  var ipeak = nums.iout / 1e3 * 2.0;
 
-  Results results = (
+  return (
     lmin: (nums.vin - 1 - nums.vout) / ipeak * ton_max,
     ct: ton_max * 4e-5,
     cout: (ipeak * tontoff) / (8 * RIPPLE),
@@ -180,23 +178,20 @@ Results stepDown(Numbers nums) {
     rb: 0.0,
     name: 'Step-down regulator',
     schematic: 'step_down.png'
-
   );
-
-  return results;
 }
 
 // -------------------------------------
 Results stepUp(Numbers nums) {
-  final ratio = (nums.vout + 0.8 - nums.vin) / (nums.vin - 1);
-  final tontoff = 1.0 / (nums.freq * 1e3);
-  final toff = tontoff / (ratio + 1);
-  final ton_max = tontoff - toff;
-  final ipeak = nums.iout / 1e3 * (ratio + 1) * 2.0;
-  final ib = ipeak / 20 + 5e-3;
-  final rsc = 0.33 / ipeak;
+  var ratio = (nums.vout + 0.8 - nums.vin) / (nums.vin - 1);
+  var tontoff = 1.0 / (nums.freq * 1e3);
+  var toff = tontoff / (ratio + 1);
+  var ton_max = tontoff - toff;
+  var ipeak = nums.iout / 1e3 * (ratio + 1) * 2.0;
+  var ib = ipeak / 20 + 5e-3;
+  var rsc = 0.33 / ipeak;
 
-  Results results = (
+  return (
     lmin: (nums.vin - 1) / ipeak * ton_max,
     ct: ton_max * 4e-5,
     cout: (nums.iout / 1e3 * ton_max) / RIPPLE,
@@ -206,19 +201,17 @@ Results stepUp(Numbers nums) {
     name: 'Step-up regulator',
     schematic: 'step_up.png'
   );
-
-  return results;
 }
 
 // -------------------------------------
 Results inverter(Numbers nums) {
-  final ratio = ((nums.vout).abs() + 0.8) / (nums.vin - 0.8);
-  final tontoff = 1.0 / (nums.freq * 1e3);
-  final toff = tontoff / (ratio + 1);
-  final ton = tontoff - toff;
-  final ipeak = (2 * nums.iout / 1e3) * (ratio + 1);
+  var ratio = ((nums.vout).abs() + 0.8) / (nums.vin - 0.8);
+  var tontoff = 1.0 / (nums.freq * 1e3);
+  var toff = tontoff / (ratio + 1);
+  var ton = tontoff - toff;
+  var ipeak = (2 * nums.iout / 1e3) * (ratio + 1);
 
-  Results results = (
+  return (
     lmin: (nums.vin - 0.8) / ipeak * ton,
     ct: ton * 4e-5,
     cout: (nums.iout / 1e3 * ton) / RIPPLE,
@@ -228,8 +221,6 @@ Results inverter(Numbers nums) {
     name: 'Inverter regulator',
     schematic: 'inverter.png'
   );
-
-  return results;
 }
 
 // -------------------------------------
@@ -251,19 +242,20 @@ String formatResults(Results results) {
 
 // -------------------------------------
 void updatePage(Results results) {
-  var resultFmt = '';
-  if (results.lmin != 0.0) resultFmt = formatResults(results);
+  var resultFmt = (results.lmin != 0.0) ? formatResults(results) : '';
 
   document.getElementById('results')!.innerHTML = resultFmt.toJS;
-  document.getElementById('regulator-name')!.innerHTML = '<b>${results.name}</b>'.toJS;
+  document.getElementById('regulator-name')!.innerHTML =
+      '<b>${results.name}</b>'.toJS;
 
-  final image = document.getElementById('schematic') as HTMLImageElement;
+  var image = document.getElementById('schematic') as HTMLImageElement;
   image.src = 'resources/${results.schematic}';
 }
 
 // -------------------------------------
 void greetings() {
-  const msg = '''<center><b>MC34063 calculator \u00A9 2025 - RonLinu</b></center><br>
+  const msg =
+      '''<center><b>MC34063 calculator \u00A9 2025 - RonLinu</b></center><br>
         This application calculates the value of all parts required
         to build a switching regulator based on the MC34063.
         <br><br>
@@ -273,5 +265,5 @@ void greetings() {
         - Inverter
     ''';
 
-   showDialog(msg);
+  showDialog(msg);
 }
