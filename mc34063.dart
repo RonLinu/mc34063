@@ -6,35 +6,24 @@ import 'dialogs.dart';
 
 const RIPPLE = 0.1;
 
-// Values from user fields
-typedef Fields = ({
-  String vin,
-  String vout,
-  String iout,
-  String freq,
-  String res1
-});
+class Fields {
+  double vin = 0;
+  double vout = 0;
+  double iout = 0;
+  double freq = 0;
+  double res1 = 0;
+}
 
-// Values converted to floating points
-typedef Numbers = ({
-  double vin,
-  double vout,
-  double iout,
-  double freq,
-  double res1
-});
-
-// Results from calculations
-typedef Results = ({
-  double lmin,
-  double ct,
-  double cout,
-  double rsc,
-  double r2,
-  double rb,
-  String name,
-  String schematic
-});
+class Results {
+  double lmin = 0;
+  double ct = 0;
+  double cout = 0;
+  double rsc = 0;
+  double r2 = 0;
+  double rb = 0;
+  String name = 'Regulator name';
+  String schematic = 'splash.png';
+}
 
 // -----------------------------------------------------------------------------
 void main() {
@@ -50,22 +39,11 @@ void main() {
 
   calculateBtn!.onClick.listen((_) {
     // Clear page to defaults
-    var results = (
-      lmin: 0.0,
-      ct: 0.0,
-      cout: 0.0,
-      rsc: 0.0,
-      r2: 0.0,
-      rb: 0.0,
-      name: 'Regulator name',
-      schematic: 'splash.png',
-    );
-
+    var results = Results();
     updatePage(results);
 
     // Read fields, convert to floats, check limits
-    var htmlFields = readHtmlFields();
-    var nums = convertToFloats(htmlFields);
+    var nums = readFields();
     var errors = validateLimits(nums);
 
     if (errors.isNotEmpty) {
@@ -89,14 +67,14 @@ void main() {
 
 // -------------------------------------
 void saveHtmlFields() {
-  var fields = readHtmlFields();
+  var fields = readFields();
 
   var values = {
-    'vin': fields.vin,
-    'vout': fields.vout,
-    'iout': fields.iout,
-    'freq': fields.freq,
-    'res1': fields.res1,
+    'vin': fields.vin.toString(),
+    'vout': fields.vout.toString(),
+    'iout': fields.iout.toString(),
+    'freq': fields.freq.toString(),
+    'res1': fields.res1.toString(),
   };
 
   var jsonString = jsonEncode(values);
@@ -120,30 +98,24 @@ void restoreHtmlFields() {
 }
 
 // -------------------------------------
-Fields readHtmlFields() {
-  return (
-    vin: (document.getElementById('vin') as HTMLInputElement).value,
-    vout: (document.getElementById('vout') as HTMLInputElement).value,
-    iout: (document.getElementById('iout') as HTMLInputElement).value,
-    freq: (document.getElementById('freq') as HTMLInputElement).value,
-    res1: (document.getElementById('res1') as HTMLInputElement).value
-  );
-}
-
-// -------------------------------------
-Numbers convertToFloats(Fields fields) {
+Fields readFields() {
+  var fvin = (document.getElementById('vin') as HTMLInputElement).value;
+  var fvout = (document.getElementById('vout') as HTMLInputElement).value;
+  var fiout = (document.getElementById('iout') as HTMLInputElement).value;
+  var ffreq = (document.getElementById('freq') as HTMLInputElement).value;
+  var fres1 = (document.getElementById('res1') as HTMLInputElement).value;
+    
   // Fields are expected to contain valid float numbers with html screening
-  return (
-    vin: double.parse(fields.vin),
-    vout: double.parse(fields.vout),
-    iout: double.parse(fields.iout),
-    freq: double.parse(fields.freq),
-    res1: double.parse(fields.res1)
-  );
+  return Fields()
+    ..vin = double.parse(fvin)
+    ..vout = double.parse(fvout)
+    ..iout = double.parse(fiout)
+    ..freq = double.parse(ffreq)
+    ..res1 = double.parse(fres1);
 }
 
 // -------------------------------------
-String validateLimits(Numbers nums) {
+String validateLimits(Fields nums) {
   var errors = '';
 
   if (nums.vin < 3.0 || nums.vin > 40) errors += '- Input voltage<br>';
@@ -162,27 +134,26 @@ String validateLimits(Numbers nums) {
 }
 
 // -------------------------------------
-Results stepDown(Numbers nums) {
+Results stepDown(Fields nums) {
   var ratio = (nums.vout + 0.8) / (nums.vin - 0.8 - nums.vout);
   var tontoff = 1.0 / (nums.freq * 1e3);
   var toff = tontoff / (ratio + 1);
   var ton_max = tontoff - toff;
   var ipeak = nums.iout / 1e3 * 2.0;
 
-  return (
-    lmin: (nums.vin - 1 - nums.vout) / ipeak * ton_max,
-    ct: ton_max * 4e-5,
-    cout: (ipeak * tontoff) / (8 * RIPPLE),
-    rsc: 0.33 / ipeak,
-    r2: (nums.vout - 1.25) / 1.25 * nums.res1,
-    rb: 0.0,
-    name: 'Step-down regulator',
-    schematic: 'step_down.png'
-  );
+  return Results()
+    ..lmin = (nums.vin - 1 - nums.vout) / ipeak * ton_max
+    ..ct = ton_max * 4e-5
+    ..cout = (ipeak * tontoff) / (8 * RIPPLE)
+    ..rsc = 0.33 / ipeak
+    ..r2 = (nums.vout - 1.25) / 1.25 * nums.res1
+    ..rb = 0.0
+    ..name = 'Step-down regulator'
+    ..schematic = 'step_down.png';
 }
 
 // -------------------------------------
-Results stepUp(Numbers nums) {
+Results stepUp(Fields nums) {
   var ratio = (nums.vout + 0.8 - nums.vin) / (nums.vin - 1);
   var tontoff = 1.0 / (nums.freq * 1e3);
   var toff = tontoff / (ratio + 1);
@@ -191,36 +162,34 @@ Results stepUp(Numbers nums) {
   var ib = ipeak / 20 + 5e-3;
   var rsc = 0.33 / ipeak;
 
-  return (
-    lmin: (nums.vin - 1) / ipeak * ton_max,
-    ct: ton_max * 4e-5,
-    cout: (nums.iout / 1e3 * ton_max) / RIPPLE,
-    rsc: rsc,
-    r2: ((nums.vout - 1.25) / 1.25) * nums.res1,
-    rb: ((nums.vin - 1) - ipeak) * rsc / ib,
-    name: 'Step-up regulator',
-    schematic: 'step_up.png'
-  );
+  return Results()
+    ..lmin = (nums.vin - 1) / ipeak * ton_max
+    ..ct = ton_max * 4e-5
+    ..cout = (nums.iout / 1e3 * ton_max) / RIPPLE
+    ..rsc = rsc
+    ..r2 = ((nums.vout - 1.25) / 1.25) * nums.res1
+    ..rb = ((nums.vin - 1) - ipeak) * rsc / ib
+    ..name = 'Step-up regulator'
+    ..schematic = 'step_up.png';
 }
 
 // -------------------------------------
-Results inverter(Numbers nums) {
+Results inverter(Fields nums) {
   var ratio = ((nums.vout).abs() + 0.8) / (nums.vin - 0.8);
   var tontoff = 1.0 / (nums.freq * 1e3);
   var toff = tontoff / (ratio + 1);
   var ton = tontoff - toff;
   var ipeak = (2 * nums.iout / 1e3) * (ratio + 1);
 
-  return (
-    lmin: (nums.vin - 0.8) / ipeak * ton,
-    ct: ton * 4e-5,
-    cout: (nums.iout / 1e3 * ton) / RIPPLE,
-    rsc: 0.33 / ipeak,
-    r2: (((nums.vout).abs() - 1.25) / 1.25) * nums.res1,
-    rb: 0.0,
-    name: 'Inverter regulator',
-    schematic: 'inverter.png'
-  );
+  return Results()
+    ..lmin = (nums.vin - 0.8) / ipeak * ton
+    ..ct = ton * 4e-5
+    ..cout = (nums.iout / 1e3 * ton) / RIPPLE
+    ..rsc = 0.33 / ipeak
+    ..r2 = (((nums.vout).abs() - 1.25) / 1.25) * nums.res1
+    ..rb = 0.0
+    ..name = 'Inverter regulator'
+    ..schematic = 'inverter.png';
 }
 
 // -------------------------------------
