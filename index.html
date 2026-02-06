@@ -16,7 +16,7 @@
       <h2 id="title" class="heading-center">MC34063 calculator</h2>
     </div>
     
-    <form>
+    <form id="myForm">
       <div class="form-row">
         <label for="inputVoltage" class="label-left">Input voltage</label>
         <input type="text" inputmode="numeric" id="vin" value="24" oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')">

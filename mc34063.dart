@@ -4,14 +4,13 @@ import 'dart:convert'; // for json conversions
 
 import 'dialogs.dart';
 
-const RIPPLE = 0.1;
-
-class Fields {
+class InputValues {
   double vin = 0;
   double vout = 0;
   double iout = 0;
   double freq = 0;
   double res1 = 0;
+  double ripple = 0.1;
 }
 
 class Results {
@@ -32,7 +31,8 @@ void main() {
 
   restoreHtmlFields();
   greetings();
-
+  setInputChangeDetection();
+  
   saveBtn!.onClick.listen((_) {
     saveHtmlFields();
   });
@@ -43,12 +43,12 @@ void main() {
     updatePage(results);
 
     // Read fields, convert to floats, check limits
-    var nums = readFields();
+    var nums = readInputValues();
     var errors = validateLimits(nums);
 
     if (errors.isNotEmpty) {
       var occurences = errors.split('-').length - 1;
-      var plural = (occurences > 1) ? 'these fields' : 'this field';
+      var plural = occurences > 1 ? 'these fields' : 'this field';
       showDialog('Value is out of range in $plural <hr> $errors');
       return;
     }
@@ -67,7 +67,7 @@ void main() {
 
 // -------------------------------------
 void saveHtmlFields() {
-  var fields = readFields();
+  var fields = readInputValues();
 
   var values = {
     'vin': fields.vin.toString(),
@@ -98,7 +98,7 @@ void restoreHtmlFields() {
 }
 
 // -------------------------------------
-Fields readFields() {
+InputValues readInputValues() {
   var fvin = (document.getElementById('vin') as HTMLInputElement).value;
   var fvout = (document.getElementById('vout') as HTMLInputElement).value;
   var fiout = (document.getElementById('iout') as HTMLInputElement).value;
@@ -106,7 +106,7 @@ Fields readFields() {
   var fres1 = (document.getElementById('res1') as HTMLInputElement).value;
     
   // Fields are expected to contain valid float numbers with html screening
-  return Fields()
+  return InputValues()
     ..vin = double.parse(fvin)
     ..vout = double.parse(fvout)
     ..iout = double.parse(fiout)
@@ -115,7 +115,7 @@ Fields readFields() {
 }
 
 // -------------------------------------
-String validateLimits(Fields nums) {
+String validateLimits(InputValues nums) {
   var errors = '';
 
   if (nums.vin < 3.0 || nums.vin > 40) errors += '- Input voltage<br>';
@@ -134,7 +134,7 @@ String validateLimits(Fields nums) {
 }
 
 // -------------------------------------
-Results stepDown(Fields nums) {
+Results stepDown(InputValues nums) {
   var ratio = (nums.vout + 0.8) / (nums.vin - 0.8 - nums.vout);
   var tontoff = 1.0 / (nums.freq * 1e3);
   var toff = tontoff / (ratio + 1);
@@ -144,7 +144,7 @@ Results stepDown(Fields nums) {
   return Results()
     ..lmin = (nums.vin - 1 - nums.vout) / ipeak * ton_max
     ..ct = ton_max * 4e-5
-    ..cout = (ipeak * tontoff) / (8 * RIPPLE)
+    ..cout = (ipeak * tontoff) / (8 * nums.ripple)
     ..rsc = 0.33 / ipeak
     ..r2 = (nums.vout - 1.25) / 1.25 * nums.res1
     ..rb = 0.0
@@ -153,7 +153,7 @@ Results stepDown(Fields nums) {
 }
 
 // -------------------------------------
-Results stepUp(Fields nums) {
+Results stepUp(InputValues nums) {
   var ratio = (nums.vout + 0.8 - nums.vin) / (nums.vin - 1);
   var tontoff = 1.0 / (nums.freq * 1e3);
   var toff = tontoff / (ratio + 1);
@@ -165,7 +165,7 @@ Results stepUp(Fields nums) {
   return Results()
     ..lmin = (nums.vin - 1) / ipeak * ton_max
     ..ct = ton_max * 4e-5
-    ..cout = (nums.iout / 1e3 * ton_max) / RIPPLE
+    ..cout = (nums.iout / 1e3 * ton_max) / nums.ripple
     ..rsc = rsc
     ..r2 = ((nums.vout - 1.25) / 1.25) * nums.res1
     ..rb = ((nums.vin - 1) - ipeak) * rsc / ib
@@ -174,7 +174,7 @@ Results stepUp(Fields nums) {
 }
 
 // -------------------------------------
-Results inverter(Fields nums) {
+Results inverter(InputValues nums) {
   var ratio = ((nums.vout).abs() + 0.8) / (nums.vin - 0.8);
   var tontoff = 1.0 / (nums.freq * 1e3);
   var toff = tontoff / (ratio + 1);
@@ -184,7 +184,7 @@ Results inverter(Fields nums) {
   return Results()
     ..lmin = (nums.vin - 0.8) / ipeak * ton
     ..ct = ton * 4e-5
-    ..cout = (nums.iout / 1e3 * ton) / RIPPLE
+    ..cout = (nums.iout / 1e3 * ton) / nums.ripple
     ..rsc = 0.33 / ipeak
     ..r2 = (((nums.vout).abs() - 1.25) / 1.25) * nums.res1
     ..rb = 0.0
@@ -211,7 +211,7 @@ String formatResults(Results results) {
 
 // -------------------------------------
 void updatePage(Results results) {
-  var resultFmt = (results.lmin != 0.0) ? formatResults(results) : '';
+  var resultFmt = results.lmin != 0.0 ? formatResults(results) : '';
 
   document.getElementById('results')!.innerHTML = resultFmt.toJS;
   document.getElementById('regulator-name')!.innerHTML =
@@ -235,4 +235,20 @@ void greetings() {
     ''';
 
   showDialog(msg);
+}
+
+// -------------------------------------
+void setInputChangeDetection() {
+  var form = document.querySelector('#myForm') as HTMLFormElement;
+
+  void onFormModified(_) {
+    var results = new Results();
+    updatePage(results);
+  }
+
+  // Fires while typing, toggling, etc.
+  form.onInput.listen(onFormModified);
+
+  // Covers selects, checkboxes, and blur-based changes
+  //~ form.onChange.listen(onFormModified);    
 }
