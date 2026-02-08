@@ -26,24 +26,35 @@ class Results {
 
 // -----------------------------------------------------------------------------
 void main() {
-  var saveBtn = document.getElementById('save');
-  var calculateBtn = document.getElementById('calculate');
+  var saveBtn = document.getElementById('save') as HTMLButtonElement;;
+  var calculateBtn = document.getElementById('calculate') as HTMLButtonElement;
 
   restoreHtmlFields();
   greetings();
   setInputChangeDetection();
-  
-  saveBtn!.onClick.listen((_) {
+
+  // -------------------------  
+  saveBtn.onClick.listen((_) {
     saveHtmlFields();
   });
 
-  calculateBtn!.onClick.listen((_) {
-    // Clear page to defaults
-    var results = Results();
+  // -------------------------  
+  calculateBtn.onClick.listen((_) {
+    // Abort if results are already displayed on screen
+    var htmlResults = document.getElementById('results')!.textContent;
+    if (htmlResults!.isNotEmpty) {
+      showDialog('Results are already up to date!');
+      return;
+    }
+    
+    // Clear results on screen
+    var results = new Results();
     updatePage(results);
 
-    // Read fields, convert to floats, check limits
+    // Read html fields and convert to floats
     var nums = readInputValues();
+    
+    // Check if values are within chip limits
     var errors = validateLimits(nums);
 
     if (errors.isNotEmpty) {
@@ -53,7 +64,7 @@ void main() {
       return;
     }
 
-    // Dispatch to appropriate regulator circuit
+    // Dispatch regulator calculation
     if (nums.vout < 0)
       results = inverter(nums);
     else if (nums.vout < nums.vin)
@@ -63,6 +74,22 @@ void main() {
 
     updatePage(results);
   });
+}
+
+// -------------------------------------
+void greetings() {
+  const msg =
+      '''<center><b>MC34063 calculator \u00A9 2025 - RonLinu</b></center><br>
+        This application calculates the value of all parts required
+        to build a switching regulator based on the MC34063.
+        <br><br>
+        The following configurations are supported:<br>
+        - Step Down (buck)<br>
+        - Step Up (boost)<br>
+        - Inverter
+    ''';
+
+  showDialog(msg);
 }
 
 // -------------------------------------
@@ -92,8 +119,8 @@ void restoreHtmlFields() {
 
   // Update fields on screen
   for (var field in fields.entries) {
-    var f = document.getElementById(field.key) as HTMLInputElement;
-    f.value = field.value;
+    var fieldHandle = document.getElementById(field.key) as HTMLInputElement;
+    fieldHandle.value = field.value;
   }
 }
 
@@ -222,33 +249,15 @@ void updatePage(Results results) {
 }
 
 // -------------------------------------
-void greetings() {
-  const msg =
-      '''<center><b>MC34063 calculator \u00A9 2025 - RonLinu</b></center><br>
-        This application calculates the value of all parts required
-        to build a switching regulator based on the MC34063.
-        <br><br>
-        The following configurations are supported:<br>
-        - Step Down (buck)<br>
-        - Step Up (boost)<br>
-        - Inverter
-    ''';
-
-  showDialog(msg);
-}
-
-// -------------------------------------
 void setInputChangeDetection() {
-  var form = document.querySelector('#myForm') as HTMLFormElement;
+  var form = document.getElementById('myForm') as HTMLFormElement;
+  var results = new Results();
 
   void onFormModified(_) {
-    var results = new Results();
+    // Clear results on screen
     updatePage(results);
   }
 
-  // Fires while typing, toggling, etc.
+  // Fires when typing in any input field
   form.onInput.listen(onFormModified);
-
-  // Covers selects, checkboxes, and blur-based changes
-  //~ form.onChange.listen(onFormModified);    
 }
